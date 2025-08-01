@@ -50,7 +50,8 @@ const Testimonials = () => {
     }
   ];
 
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPausedRow1, setIsPausedRow1] = useState(false);
+  const [isPausedRow2, setIsPausedRow2] = useState(false);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: rating }, (_, index) => (
@@ -95,12 +96,12 @@ const Testimonials = () => {
       </div>
 
       {/* First Row - Left to Right */}
-      <div 
+      <div
         className="flex mb-8"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        onMouseEnter={() => setIsPausedRow1(true)}
+        onMouseLeave={() => setIsPausedRow1(false)}
       >
-        <div className={`flex animate-scroll-right ${isPaused ? 'pause-animation' : ''}`}>
+        <div className={`flex animate-scroll-right ${isPausedRow1 ? 'pause-animation' : ''}`}>
           {[...testimonials, ...testimonials].map((testimonial, index) => (
             <TestimonialCard key={`row1-${index}`} testimonial={testimonial} index={index} />
           ))}
@@ -108,12 +109,12 @@ const Testimonials = () => {
       </div>
 
       {/* Second Row - Right to Left */}
-      <div 
+      <div
         className="flex"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        onMouseEnter={() => setIsPausedRow2(true)}
+        onMouseLeave={() => setIsPausedRow2(false)}
       >
-        <div className={`flex animate-scroll-left ${isPaused ? 'pause-animation' : ''}`}>
+        <div className={`flex animate-scroll-left ${isPausedRow2 ? 'pause-animation' : ''}`}>
           {[...testimonials.slice().reverse(), ...testimonials.slice().reverse()].map((testimonial, index) => (
             <TestimonialCard key={`row2-${index}`} testimonial={testimonial} index={index} />
           ))}
