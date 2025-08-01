@@ -1,9 +1,11 @@
 import { ArrowRight, Users, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const CallToAction = () => {
+  const { ref, isVisible } = useScrollAnimation();
   return (
-    <section className="py-20 bg-gradient-primary relative overflow-hidden">
+    <section ref={ref} className="py-20 bg-gradient-primary relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-10 left-10 w-20 h-20 border-2 border-white rounded-full animate-float"></div>
@@ -12,7 +14,7 @@ const CallToAction = () => {
         <div className="absolute bottom-32 right-1/3 w-14 h-14 border-2 border-white rounded-full animate-float" style={{ animationDelay: '0.5s' }}></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 animate-fade-in">
             Ready to Begin Your Journey?

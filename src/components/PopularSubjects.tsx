@@ -1,8 +1,10 @@
 import { Calculator, Atom, FlaskConical, Dna, TrendingUp, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const PopularSubjects = () => {
+  const { ref, isVisible } = useScrollAnimation();
   const subjects = [
     {
       icon: Calculator,
@@ -49,8 +51,8 @@ const PopularSubjects = () => {
   ];
 
   return (
-    <section id="courses" className="py-20 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section ref={ref} id="courses" className="py-20 bg-background">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
             Most Popular Subjects

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Testimonials = () => {
+  const { ref, isVisible } = useScrollAnimation();
   const testimonials = [
     {
       name: "Aisha Khan",
@@ -80,8 +82,8 @@ const Testimonials = () => {
   );
 
   return (
-    <section className="py-20 bg-background overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <section ref={ref} className="py-20 bg-background overflow-hidden">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
             What Our Students Say
