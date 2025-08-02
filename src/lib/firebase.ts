@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore"; // Uncomment if Firestore is needed
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -14,13 +15,12 @@ const firebaseConfig = {
   storageBucket: "tutorspool-52a65.firebasestorage.app",
   messagingSenderId: "847079525866",
   appId: "1:847079525866:web:0d43a4c829223d5b29b693",
-  measurementId: "G-0ZXWW194Z9"
+  measurementId: "G-0ZXWW194Z9",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-
-export { auth, provider };
+export const db = getFirestore(app);
+export { auth, provider, app };

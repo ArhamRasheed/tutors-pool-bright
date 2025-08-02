@@ -60,14 +60,60 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+- Radix UI
+- React Hook Form
+- Zod
+- React Router
+- React Query
+- React Icons
+- React Hot Toast
+- React Date Picker
+- React Select
+- React Hook Form Devtools
+- React Query Devtools
+- React Devtools
+- React Testing Library
+- Vitest
+- Storybook
+- ESLint
+- Prettier
 
-Simply open [Lovable](https://lovable.dev/projects/af7d9ce4-e26a-436b-a241-2c9412bb087b) and click on Share -> Publish.
+## Files
+- `src/`: Contains the source code of your application.
+- `src/components/`: Contains reusable components.
+- `src/pages/`: Contains the main pages of your application.
+- `src/utils/`: Contains utility functions and constants.
+- `src/styles/`: Contains global styles and Tailwind CSS configuration.
+- `src/assets/`: Contains static assets like images and icons.
+- `src/hooks/`: Contains custom React hooks.
+- `src/services/`: Contains API service functions.
+- `src/tests/`: Contains test files for your application.
+- `src/stories/`: Contains Storybook stories for your components.
+- `src/mocks/`: Contains mock data for testing purposes.
+- `src/types/`: Contains TypeScript type definitions.
+- `src/config/`: Contains configuration files for the application.
+- `src/routes/`: Contains route definitions for React Router.
+- `src/context/`: Contains context providers for state management.
+- `src/locales/`: Contains localization files for internationalization.
+- `src/validators/`: Contains Zod schemas for form validation.
+- `src/assets/icons/`: Contains SVG icons used in the application.
+- `src/assets/images/`: Contains images used in the application.
+- `src/assets/fonts/`: Contains custom fonts used in the application.
+- `src/assets/videos/`: Contains video files used in the application.
+- `src/assets/audio/`: Contains audio files used in the application.
+- `src/assets/data/`: Contains static data files used in the application.
+- `src/assets/animations/`: Contains animation files used in the application.
+- `src/assets/themes/`: Contains theme files for styling the application.
+- `src/assets/languages/`: Contains language files for localization.
+- `src/assets/typography/`: Contains typography styles and definitions.
 
-## Can I connect a custom domain to my Lovable project?
+## Tech stack
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, shadcn-ui
+- **State Management**: React Query, React Hook Form
+- **Validation**: Zod
+- **Routing**: React Router
+- **Testing**: Vitest, React Testing Library
+- **Development Tools**: ESLint, Prettier, Storybook
+- **Version Control**: GitHub
+- **Deployment**: Vercel (or any other preferred hosting service)
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

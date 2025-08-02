@@ -9,12 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../lib/firebase";
+
 
 const JoinFree = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [accountType, setAccountType] = useState("student");
-
+  
   const subjects = [
     "Mathematics", "Physics", "Chemistry", "Biology", 
     "Economics", "English Literature", "Computer Science", "History"
@@ -64,7 +67,7 @@ const JoinFree = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="tutor" className="space-y-6 mt-6">
+              {/* <TabsContent value="tutor" className="space-y-6 mt-6">
                 <TutorForm 
                   showPassword={showPassword} 
                   setShowPassword={setShowPassword}
@@ -73,7 +76,7 @@ const JoinFree = () => {
                   subjects={subjects}
                   grades={grades}
                 />
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </CardContent>
         </Card>
@@ -92,6 +95,57 @@ const JoinFree = () => {
 };
 
 const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
+  
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    grade: "",
+    subject: "",
+    agreed: false
+  });
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.agreed) {
+      alert("You must agree to Terms and Privacy Policy.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    const { success, error } = await submitUser(formData, "student");
+    if (success) {
+      alert("Student account created successfully.");
+      // Optional: Redirect or clear form
+    } else {
+      alert("Failed to create account. " + error.message);
+    }
+  };
+
+
+  const submitUser = async (data: any, userType: "student" | "tutor") => {
+    try {
+      const docRef = await addDoc(collection(db, userType + "s"), {
+        ...data,
+        createdAt: serverTimestamp(),
+        role: userType,
+      });
+      return { success: true, id: docRef.id };
+      } 
+    catch (error) {
+      console.error("Error submitting user:", error);
+      return { success: false, error };
+    }
+  };
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -99,12 +153,14 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
           <Label htmlFor="firstName">First Name</Label>
           <div className="relative">
             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input id="firstName" placeholder="First name" className="pl-10" />
+            <Input id="firstName" placeholder="First name" className="pl-10"  value={formData.firstName}
+                onChange={e => handleChange("firstName", e.target.value)} />
           </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="lastName">Last Name</Label>
-          <Input id="lastName" placeholder="Last name" />
+          <Input id="lastName" placeholder="Last name"  value={formData.lastName}
+                onChange={e => handleChange("lastName", e.target.value)}/>
         </div>
       </div>
 
@@ -112,7 +168,8 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         <Label htmlFor="email">Email</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input id="email" type="email" placeholder="your@email.com" className="pl-10" />
+          <Input id="email" type="email" placeholder="your@email.com" className="pl-10" value={formData.email}
+            onChange={e => handleChange("email", e.target.value)} />
         </div>
       </div>
 
@@ -126,6 +183,8 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
               type={showPassword ? "text" : "password"}
               placeholder="Create password"
               className="pl-10 pr-10"
+              value={formData.password}
+              onChange={e => handleChange("password", e.target.value)}
             />
             <Button
               type="button"
@@ -147,6 +206,8 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm password"
               className="pl-10 pr-10"
+              value={formData.confirmPassword}
+              onChange={e => handleChange("confirmPassword", e.target.value)}
             />
             <Button
               type="button"
@@ -163,7 +224,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
 
       <div className="space-y-2">
         <Label htmlFor="grade">Current Grade Level</Label>
-        <Select>
+        <Select onValueChange={value => handleChange("grade", value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select your grade level" />
           </SelectTrigger>
@@ -177,7 +238,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
 
       <div className="space-y-2">
         <Label htmlFor="subjects">Subjects of Interest</Label>
-        <Select>
+        <Select onValueChange={value => handleChange("subject", value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select subjects you want to learn" />
           </SelectTrigger>
@@ -190,19 +251,22 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
       </div>
 
       <div className="flex items-center space-x-2">
-        <Checkbox id="terms" />
-        <label
-          htmlFor="terms"
+        <Checkbox 
+        id="terms" 
+        checked={formData.agreed} 
+        onCheckedChange={(checked) => handleChange("agreed", checked === true)} 
+        />
+        <label htmlFor="terms"
           className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
-          I agree to the{" "}
-          <a href="#" className="text-primary hover:underline">Terms of Service</a>
-          {" "}and{" "}
-          <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+        I agree to the{" "}
+        <a href="#" className="text-primary hover:underline">Terms of Service</a>{" "}and{" "}
+        <a href="#" className="text-primary hover:underline">Privacy Policy</a>
         </label>
       </div>
 
-      <Button variant="hero" size="lg" className="w-full">
+
+      <Button variant="hero" size="lg" className="w-full" onClick={handleSubmit}>
         Create Student Account
       </Button>
 
@@ -228,7 +292,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
   );
 };
 
-const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
+/*const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
   return (
     <>
       <div className="bg-accent/50 rounded-lg p-4 mb-4">
@@ -361,6 +425,5 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       </Button>
     </>
   );
-};
-
+};*/
 export default JoinFree;
