@@ -47,20 +47,20 @@ const StudentProfile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-section">
       {/* Top Navigation */}
-      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border shadow-elegant">
         <div className="max-w-full px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
-              <Link to="/" className="text-2xl font-bold text-primary">
+              <Link to="/" className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                 TutorsPool
               </Link>
               <div className="hidden md:flex items-center space-x-6">
-                <Link to="/student" className="text-foreground hover:text-primary transition-colors font-medium">
+                <Link to="/student" className="text-foreground hover:text-primary transition-all duration-300 font-medium">
                   My Learning
                 </Link>
-                <Link to="/explore" className="text-muted-foreground hover:text-primary transition-colors font-medium">
+                <Link to="/explore" className="text-muted-foreground hover:text-primary transition-all duration-300 font-medium">
                   Explore Courses
                 </Link>
               </div>
@@ -68,9 +68,9 @@ const StudentProfile = () => {
             
             {/* Streak Widget */}
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-accent/10 px-3 py-2 rounded-full">
-                <Flame className="h-4 w-4 text-accent" />
-                <span className="text-sm font-medium">{student.currentStreak} day streak</span>
+              <div className="flex items-center space-x-2 bg-gradient-primary px-3 py-2 rounded-full shadow-glow">
+                <Flame className="h-4 w-4 text-white" />
+                <span className="text-sm font-medium text-white">{student.currentStreak} day streak</span>
               </div>
               
               <Avatar className="h-8 w-8">
@@ -84,16 +84,16 @@ const StudentProfile = () => {
 
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-card border-r border-border sticky top-[73px] h-[calc(100vh-73px)]">
+        <aside className="w-64 bg-card/50 backdrop-blur-sm border-r border-border sticky top-[73px] h-[calc(100vh-73px)] shadow-elegant">
           <div className="p-6">
             <nav className="space-y-2">
               {sidebarItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-300 hover:shadow-md ${
                     item.active 
-                      ? "bg-primary/10 text-primary font-medium" 
+                      ? "bg-gradient-primary text-white font-medium shadow-glow" 
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
@@ -117,7 +117,7 @@ const StudentProfile = () => {
             {/* Student Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Personal Information */}
-              <Card className="shadow-elegant">
+              <Card className="shadow-elegant bg-card/50 backdrop-blur-sm border-border hover:shadow-glow transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <GraduationCap className="h-5 w-5" />
@@ -134,7 +134,9 @@ const StudentProfile = () => {
                     </Avatar>
                     <div>
                       <h3 className="text-lg font-semibold">{student.name}</h3>
-                      <Badge variant="secondary">{student.grade}</Badge>
+                      <div className="bg-gradient-primary px-2 py-1 rounded-full">
+                        <span className="text-xs font-medium text-white">{student.grade}</span>
+                      </div>
                     </div>
                   </div>
                   
@@ -158,7 +160,7 @@ const StudentProfile = () => {
               </Card>
 
               {/* Learning Stats */}
-              <Card className="shadow-elegant">
+              <Card className="shadow-elegant bg-card/50 backdrop-blur-sm border-border hover:shadow-glow transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Flame className="h-5 w-5" />
@@ -167,14 +169,14 @@ const StudentProfile = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center space-y-4">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent/10">
-                      <Flame className="h-10 w-10 text-accent" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-primary shadow-glow">
+                      <Flame className="h-10 w-10 text-white" />
                     </div>
                     <div>
-                      <div className="text-3xl font-bold text-accent">{student.currentStreak}</div>
+                      <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">{student.currentStreak}</div>
                       <div className="text-sm text-muted-foreground">Day Learning Streak</div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-all duration-300">
                       View Full Stats
                     </Button>
                   </div>
@@ -183,7 +185,7 @@ const StudentProfile = () => {
             </div>
 
             {/* Quick Links */}
-            <Card className="shadow-elegant">
+            <Card className="shadow-elegant bg-card/50 backdrop-blur-sm border-border hover:shadow-glow transition-all duration-300">
               <CardHeader>
                 <CardTitle>Quick Access</CardTitle>
                 <CardDescription>Your recent activities and upcoming tasks</CardDescription>
@@ -191,10 +193,10 @@ const StudentProfile = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {quickStats.map((stat, index) => (
-                    <div key={index} className="p-4 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors cursor-pointer">
+                    <div key={index} className="p-4 rounded-lg bg-gradient-section hover:shadow-md transition-all duration-300 cursor-pointer group">
                       <div className="flex items-center space-x-3">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <stat.icon className="h-4 w-4 text-primary" />
+                        <div className="p-2 rounded-lg bg-gradient-primary shadow-sm group-hover:shadow-glow transition-all duration-300">
+                          <stat.icon className="h-4 w-4 text-white" />
                         </div>
                         <div>
                           <div className="text-sm font-medium">{stat.label}</div>
@@ -211,7 +213,7 @@ const StudentProfile = () => {
 
         {/* Chat Button */}
         <div className="fixed bottom-6 right-6">
-          <Button size="icon" className="h-12 w-12 rounded-full shadow-glow">
+          <Button size="icon" className="h-12 w-12 rounded-full bg-gradient-primary shadow-glow hover:shadow-elegant transition-all duration-300 animate-glow">
             <MessageCircle className="h-6 w-6" />
           </Button>
         </div>

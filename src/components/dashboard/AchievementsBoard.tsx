@@ -73,17 +73,17 @@ export const AchievementsBoard = () => {
   const earnedAchievements = achievements.filter(a => a.earned);
   
   return (
-    <Card className="shadow-lg border-sky-100">
+    <Card className="shadow-elegant border-border bg-card/50 backdrop-blur-sm hover:shadow-glow transition-all duration-300">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center space-x-2 text-slate-700">
-          <Award className="h-5 w-5 text-sky-600" />
+        <CardTitle className="flex items-center space-x-2 text-foreground">
+          <Award className="h-5 w-5 text-primary" />
           <span>Achievements & Leaderboard</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Achievements Grid */}
         <div>
-          <h3 className="font-semibold text-slate-700 mb-4 flex items-center space-x-2">
+          <h3 className="font-semibold text-foreground mb-4 flex items-center space-x-2">
             <Trophy className="h-4 w-4 text-amber-500" />
             <span>Your Achievements ({earnedAchievements.length}/{achievements.length})</span>
           </h3>
@@ -93,23 +93,23 @@ export const AchievementsBoard = () => {
               return (
                 <div
                   key={achievement.id}
-                  className={`p-4 rounded-xl border transition-all duration-200 ${
+                  className={`p-4 rounded-xl border transition-all duration-300 hover:shadow-md group ${
                     achievement.earned
-                      ? `bg-gradient-to-br from-${achievement.color}-50 to-${achievement.color}-100 border-${achievement.color}-200 shadow-sm`
-                      : "bg-slate-50 border-slate-200 opacity-60"
+                      ? `bg-gradient-section border-border shadow-sm`
+                      : "bg-muted/30 border-border opacity-60"
                   }`}
                 >
                   <div className="text-center space-y-2">
-                    <div className={`inline-flex p-3 rounded-full ${
+                    <div className={`inline-flex p-3 rounded-full transition-all duration-300 group-hover:shadow-glow ${
                       achievement.earned 
-                        ? `bg-${achievement.color}-500` 
-                        : "bg-slate-400"
+                        ? `bg-gradient-primary shadow-glow` 
+                        : "bg-muted"
                     }`}>
                       <IconComponent className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-slate-700 text-sm">{achievement.title}</h4>
-                      <p className="text-xs text-slate-500 mt-1">{achievement.description}</p>
+                      <h4 className="font-medium text-foreground text-sm">{achievement.title}</h4>
+                      <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
                       {achievement.earned ? (
                         <Badge variant="secondary" className="mt-2 text-xs">
                           {achievement.date}
@@ -137,7 +137,7 @@ export const AchievementsBoard = () => {
 
         {/* Leaderboard */}
         <div>
-          <h3 className="font-semibold text-slate-700 mb-4 flex items-center space-x-2">
+          <h3 className="font-semibold text-foreground mb-4 flex items-center space-x-2">
             <Star className="h-4 w-4 text-purple-500" />
             <span>Weekly Leaderboard</span>
           </h3>
@@ -145,10 +145,10 @@ export const AchievementsBoard = () => {
             {leaderboard.map((student) => (
               <div
                 key={student.rank}
-                className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${
+                className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${
                   student.isMe
-                    ? "bg-gradient-to-r from-sky-50 to-emerald-50 border-sky-200 shadow-sm"
-                    : "bg-white border-slate-100 hover:bg-slate-50"
+                    ? "bg-gradient-section border-border shadow-sm"
+                    : "bg-card/30 border-border hover:bg-card/50"
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -160,16 +160,16 @@ export const AchievementsBoard = () => {
                   }`}>
                     {student.rank}
                   </div>
-                  <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-emerald-400 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow">
                     <span className="text-white font-semibold text-xs">{student.avatar}</span>
                   </div>
                   <div>
-                    <span className={`font-medium ${student.isMe ? "text-sky-700" : "text-slate-700"}`}>
+                    <span className={`font-medium ${student.isMe ? "text-primary" : "text-foreground"}`}>
                       {student.name} {student.isMe && "(You)"}
                     </span>
                   </div>
                 </div>
-                <div className="text-sm font-semibold text-slate-600">
+                <div className="text-sm font-semibold text-muted-foreground">
                   {student.points.toLocaleString()} pts
                 </div>
               </div>

@@ -9,7 +9,7 @@ import { DashboardFooter } from "@/components/dashboard/DashboardFooter";
 
 const StudentDashboard = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-emerald-50">
+    <div className="min-h-screen bg-gradient-section">
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <DashboardSidebar />

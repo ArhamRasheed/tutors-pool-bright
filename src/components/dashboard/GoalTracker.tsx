@@ -42,24 +42,24 @@ export const GoalTracker = () => {
   const totalGoals = weeklyGoals.length;
   
   return (
-    <Card className="shadow-lg border-sky-100">
+    <Card className="shadow-elegant border-border bg-card/50 backdrop-blur-sm hover:shadow-glow transition-all duration-300">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center space-x-2 text-slate-700">
-            <Target className="h-5 w-5 text-sky-600" />
+          <CardTitle className="flex items-center space-x-2 text-foreground">
+            <Target className="h-5 w-5 text-primary" />
             <span>Weekly Goals</span>
           </CardTitle>
-          <div className="text-sm text-slate-500">
+          <div className="text-sm text-muted-foreground">
             {completedGoals}/{totalGoals} completed
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Overall Progress */}
-        <div className="p-4 rounded-xl bg-gradient-to-r from-sky-50 to-emerald-50 border border-sky-100">
+        <div className="p-4 rounded-xl bg-gradient-section border border-border">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-medium text-slate-700">Overall Progress</span>
-            <span className="text-2xl font-bold text-sky-600">{Math.round((completedGoals / totalGoals) * 100)}%</span>
+            <span className="font-medium text-foreground">Overall Progress</span>
+            <span className="text-2xl font-bold text-primary">{Math.round((completedGoals / totalGoals) * 100)}%</span>
           </div>
           <Progress value={(completedGoals / totalGoals) * 100} className="h-3" />
         </div>
@@ -75,15 +75,15 @@ export const GoalTracker = () => {
                   ) : (
                     <Clock className="h-4 w-4 text-amber-500" />
                   )}
-                  <span className="font-medium text-slate-700">{goal.title}</span>
+                  <span className="font-medium text-foreground">{goal.title}</span>
                 </div>
-                <span className="text-sm text-slate-500">
+                <span className="text-sm text-muted-foreground">
                   {goal.current}/{goal.target}
                 </span>
               </div>
               <Progress 
                 value={goal.progress} 
-                className={`h-2 ${goal.status === "completed" ? "bg-emerald-100" : ""}`}
+                className={`h-2 ${goal.status === "completed" ? "bg-accent/100" : ""}`}
               />
             </div>
           ))}

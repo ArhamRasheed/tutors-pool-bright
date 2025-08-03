@@ -31,14 +31,14 @@ const upcomingSessions = [
 
 export const TimetableWidget = () => {
   return (
-    <Card className="shadow-lg border-sky-100">
+    <Card className="shadow-elegant border-border bg-card/50 backdrop-blur-sm hover:shadow-glow transition-all duration-300">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center space-x-2 text-slate-700">
-            <Calendar className="h-5 w-5 text-sky-600" />
+          <CardTitle className="flex items-center space-x-2 text-foreground">
+            <Calendar className="h-5 w-5 text-primary" />
             <span>Upcoming Sessions</span>
           </CardTitle>
-          <Button variant="outline" size="sm" className="text-sky-600 border-sky-200 hover:bg-sky-50">
+          <Button variant="outline" size="sm" className="text-primary border-border hover:bg-primary hover:text-primary-foreground transition-all duration-300">
             View All
           </Button>
         </div>
@@ -47,15 +47,15 @@ export const TimetableWidget = () => {
         {upcomingSessions.map((session) => (
           <div
             key={session.id}
-            className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-sky-50 to-emerald-50 border border-sky-100 hover:shadow-md transition-all duration-200"
+            className="flex items-center justify-between p-4 rounded-xl bg-gradient-section border border-border hover:shadow-md transition-all duration-300 group"
           >
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-sky-400 to-emerald-400 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow group-hover:shadow-elegant transition-all duration-300">
                 <Video className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-700">{session.subject}</h4>
-                <div className="flex items-center space-x-4 text-sm text-slate-500 mt-1">
+                <h4 className="font-semibold text-foreground">{session.subject}</h4>
+                <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
                   <div className="flex items-center space-x-1">
                     <User className="h-3 w-3" />
                     <span>{session.tutor}</span>
@@ -68,10 +68,10 @@ export const TimetableWidget = () => {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-medium text-slate-700">{session.time}</div>
+              <div className="text-sm font-medium text-foreground">{session.time}</div>
               <Button 
                 size="sm" 
-                className="mt-2 bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-600 hover:to-emerald-600"
+                className="mt-2 bg-gradient-primary hover:shadow-glow transition-all duration-300"
               >
                 Join
               </Button>
