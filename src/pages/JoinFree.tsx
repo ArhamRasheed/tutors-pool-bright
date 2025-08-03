@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, provider, db } from "../lib/firebase.js";
+import { signInWithPopup } from "firebase/auth";
 import { User, Mail, Lock, BookOpen, GraduationCap, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { submitUser } from "../lib/submitUser";
-
+import { useNavigate } from "react-router-dom";
 
 const JoinFree = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -105,6 +108,30 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     subject: "",
     agreed: false
   });
+  const navigate = useNavigate();
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userRef = doc(db, "users", user.uid); // user document
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          pass: null, // No password stored for Google login
+          email: user.email,
+          role: "student", // "student" or "tutor" from Tabs
+          createdAt: new Date(),
+        });
+      }
+
+      console.log("Signed up user:", user);
+        navigate("/student");
+    } catch (error) {
+      console.error("Login error:", error.message);
+    }
+};
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -124,7 +151,8 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     const { success, error } = await submitUser(formData, "student");
     if (success) {
       alert("Student account created successfully.");
-      // Optional: Redirect or clear form
+      // Optional: Redirect or clear for
+      navigate("/student");
     } else {
       alert("Failed to create account. " + error.message);
     }
@@ -263,7 +291,10 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         </div>
       </div>
 
-      <Button variant="outline" size="lg" className="w-full">
+      <Button variant="outline" size="lg" className="w-full"
+        onClick={() => {
+          console.log("Google button clicked");
+          handleGoogleLogin();}}>
         <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>

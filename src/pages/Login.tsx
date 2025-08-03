@@ -11,35 +11,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState("student");
+  const navigate = useNavigate();
 
-const handleGoogleLogin = async () => {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-    const userRef = doc(db, "users", user.uid); // user document
-    const userSnap = await getDoc(userRef);
+      const userRef = doc(db, "users", user.uid); // user document
+      const userSnap = await getDoc(userRef);
 
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        pass: null, // No password stored for Google login
-        email: user.email,
-        role: loginType, // "student" or "tutor" from Tabs
-        createdAt: new Date(),
-      });
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          pass: null, // No password stored for Google login
+          email: user.email,
+          role: loginType, // "student" or "tutor" from Tabs
+          createdAt: new Date(),
+        });
+      }
+
+      console.log("Signed up user:", user);
+      if (loginType === "student") {
+        navigate("/student");
+      }
+    } catch (error) {
+      console.error("Login error:", error.message);
     }
-
-    console.log("Signed in user:", user);
-    // Optionally redirect to /dashboard
-  } catch (error) {
-    console.error("Login error:", error.message);
-  }
 };
 
   return (
@@ -95,10 +99,11 @@ const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, loginType
     handleGoogleLogin: () => void;
     loginType: "student" | "tutor";
 }) => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [errorMsg, setErrorMsg] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
 
     const handleEmailLogin = async () => {
       setErrorMsg("");
@@ -111,6 +116,9 @@ const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, loginType
       } else {
       console.log("Logged in user:", result.user);
       // redirect or do something here
+        if (loginType === "student") {
+        navigate("/student");
+        }
       }
 
       setLoading(false);
