@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index.tsx";
+import EnhancedIndex from "./pages/EnhancedIndex.tsx";
 import Login from "./pages/Login.tsx";
 import JoinFree from "./pages/JoinFree.tsx";
 import StudentProfile from "./pages/StudentProfile.tsx";
@@ -21,7 +22,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<EnhancedIndex />} />
+            <Route path="/original" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/join" element={<JoinFree />} />
             <Route path="/student" element={<StudentProfile />} />
