@@ -15,7 +15,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { toast } from "sonner";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import {XCircle} from 'lucide-react';
+import { XCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { error } from "console";
 
@@ -107,7 +107,8 @@ const JoinFree = () => {
 
 const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-
+  const [instituteType, setInstituteType] = useState(""); // "School" or "College"
+  const [instituteName, setInstituteName] = useState("");
   const handleSubjectToggle = (subject: string, isChecked: boolean) => {
     const updatedSubjects = isChecked
       ? [...selectedSubjects, subject]
@@ -205,11 +206,11 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     if (success) {
       alert("Student account created successfully.");
       // Optional: Redirect or clear form
-      if(id){
+      if (id) {
         const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
         navigate(`/student/${id}`);
       }
-      else{
+      else {
         console.log("Id not found!");
       }
     } else {
@@ -230,7 +231,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         uid: user.uid,
         streak: 0,
       });
-      return { success: true, error: false, id: user.uid};
+      return { success: true, error: false, id: user.uid };
     }
     catch (error) {
       console.error("Error submitting user:", error);
@@ -325,6 +326,40 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-4">
+        {/* Step 1: Select School or College */}
+        <div className="space-y-2">
+          <Label htmlFor="institute-type">Select Institute Type</Label>
+          <Select onValueChange={(value) => {
+            setInstituteType(value);
+            handleChange("instituteType", value);
+          }}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select School or College" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="School">School</SelectItem>
+              <SelectItem value="College">College</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Step 2: Input for School/College Name */}
+        {instituteType && (
+          <div className="space-y-2">
+            <Label htmlFor="institute-name">
+              {instituteType} Name
+            </Label>
+            <Input
+              id="institute-name"
+              type="text"
+              placeholder={`Enter your ${instituteType.toLowerCase()} name`}
+              onChange={(e) => handleChange("instituteName", e.target.value)}
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -423,6 +458,117 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
 };
 
 const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
+
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    qualification: "",
+    experience: "",
+    specialization: "",
+    grade: "",
+    agreed: false,
+    courses: [],
+  });
+
+  const navigate = useNavigate();
+
+  const handleSubjectToggle = (subject: string, isChecked: boolean) => {
+    const updatedSubjects = isChecked
+      ? [...selectedSubjects, subject]
+      : selectedSubjects.filter((s) => s !== subject);
+
+    // Update UI state
+    setSelectedSubjects(updatedSubjects);
+
+    // Update form data
+    setFormData((prev) => ({
+      ...prev,
+      subject: updatedSubjects,
+    }));
+  };
+
+  const handleChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.agreed) {
+      alert("You must agree to Terms and Privacy Policy.");
+      return;
+    }
+
+    const requiredFields = [
+      { key: "firstName", label: "First Name" },
+      { key: "lastName", label: "Last Name" },
+      { key: "email", label: "Email" },
+      { key: "password", label: "Password" },
+      { key: "confirmPassword", label: "Confirm Password" },
+      { key: "qualification", label: "Qualification" },
+      { key: "experience", label: "Teaching Experience" },
+      { key: "courses", label: "courses" },
+      { key: "grade", label: "Grade Level Preference" }
+    ];
+
+    for (const { key, label } of requiredFields) {
+      if (!formData[key]) {
+        toast.custom((t) => (
+          <ToastError t={t} title={`Missing ${label}`} message={`Please enter ${label.toLowerCase()}.`} />
+        ), { duration: 3000 });
+        return;
+      }
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Passwords do not match" message="Please make sure both passwords are the same." />
+      ), { duration: 3000 });
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Weak Password" message="Password must be at least 8 characters." />
+      ), { duration: 3000 });
+      return;
+    }
+
+    const { success, error, id } = await submitUser(formData, "tutor");
+    if (success) {
+      alert("Tutor application submitted successfully.");
+      if (id) {
+        const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
+        navigate(`/tutor/${id}`);
+      }
+    } else {
+      alert("Failed to submit tutor application. " + error.message);
+    }
+  };
+
+  const submitUser = async (data: any, userType: "student" | "tutor") => {
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+      const docRef = await setDoc(doc(db, userType + "s", user.uid), {
+        ...data,
+        createdAt: serverTimestamp(),
+        role: userType,
+        uid: user.uid,
+        status: "pending"
+      });
+      return { success: true, error: false, id: user.uid };
+    }
+    catch (error) {
+      console.error("Error submitting user:", error);
+      return { success: false, error, id: null };
+    }
+  };
+
+
   return (
     <>
       <div className="bg-accent/50 rounded-lg p-4 mb-4">
@@ -437,12 +583,14 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
           <Label htmlFor="firstName">First Name</Label>
           <div className="relative">
             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input id="firstName" placeholder="First name" className="pl-10" />
+            <Input id="firstName" placeholder="First name" className="pl-10"
+              value={formData.firstName} onChange={(e) => handleChange("firstName", e.target.value)} />
           </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="lastName">Last Name</Label>
-          <Input id="lastName" placeholder="Last name" />
+          <Input id="lastName" placeholder="Last name"
+            value={formData.lastName} onChange={(e) => handleChange("lastName", e.target.value)} />
         </div>
       </div>
 
@@ -450,7 +598,8 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
         <Label htmlFor="email">Email</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input id="email" type="email" placeholder="your@email.com" className="pl-10" />
+          <Input id="email" type="email" placeholder="your@email.com" className="pl-10"
+            value={formData.email} onChange={(e) => handleChange("email", e.target.value)} />
         </div>
       </div>
 
@@ -464,6 +613,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
               type={showPassword ? "text" : "password"}
               placeholder="Create password"
               className="pl-10 pr-10"
+              value={formData.password} onChange={(e) => handleChange("password", e.target.value)}
             />
             <Button
               type="button"
@@ -485,6 +635,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm password"
               className="pl-10 pr-10"
+              value={formData.confirmPassword} onChange={(e) => handleChange("confirmPassword", e.target.value)}
             />
             <Button
               type="button"
@@ -501,17 +652,19 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
 
       <div className="space-y-2">
         <Label htmlFor="qualification">Highest Qualification</Label>
-        <Input id="qualification" placeholder="e.g. Masters in Mathematics" />
+        <Input id="qualification" placeholder="e.g. Masters in Mathematics"
+          value={formData.qualification} onChange={(e) => handleChange("qualification", e.target.value)} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="experience">Teaching Experience (Years)</Label>
-        <Input id="experience" type="number" placeholder="e.g. 5" />
+        <Input id="experience" type="number" placeholder="e.g. 5"
+          value={formData.experience} onChange={(e) => handleChange("experience", e.target.value)} />
       </div>
 
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <Label htmlFor="specialization">Subject Specialization</Label>
-        <Select>
+        <Select onValueChange={value => handleChange("specialization", value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select your main subject" />
           </SelectTrigger>
@@ -521,11 +674,62 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
             ))}
           </SelectContent>
         </Select>
+      </div> */}
+
+      <div className="space-y-2">
+        <Label htmlFor="subjects">Courses</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              className="w-full justify-between text-black"
+            >
+              {selectedSubjects.length > 0
+                ? selectedSubjects.join(', ')
+                : "Please select at least one course you teach"}
+            </Button>
+          </PopoverTrigger>
+
+          <PopoverContent
+            className="w-[--radix-popover-trigger-width] max-h-64 overflow-y-auto p-2 space-y-1"
+            align="start"
+          >
+            {subjects.map((subject) => {
+              const id = `subject-${subject}`;
+              const isChecked = selectedSubjects.includes(subject);
+              return (
+                <div
+                  key={id}
+                  className={`flex items-center border rounded-md px-3 py-2 cursor-pointer transition-colors ${isChecked
+                    ? "bg-muted border-primary"
+                    : "hover:bg-accent"
+                    }`}
+                  onClick={() => handleSubjectToggle(subject, !isChecked)}
+                >
+                  <Checkbox
+                    id={id}
+                    checked={isChecked}
+                    onCheckedChange={() => { }}
+                    className="mr-2 pointer-events-none"
+                  />
+                  <label
+                    htmlFor={id}
+                    className={`text-sm font-medium leading-none ${isChecked ? "!text-black-600" : "text-black"
+                      }`}
+                  >
+                    {subject}
+                  </label>
+                </div>
+              );
+            })}
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="gradeLevel">Grade Level Preference</Label>
-        <Select>
+        <Select onValueChange={value => handleChange("grade", value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select grade levels you teach" />
           </SelectTrigger>
@@ -538,7 +742,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       </div>
 
       <div className="flex items-center space-x-2">
-        <Checkbox id="terms" />
+        <Checkbox id="terms" checked={formData.agreed} onCheckedChange={(checked) => handleChange("agreed", checked)} />
         <label
           htmlFor="terms"
           className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -550,7 +754,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
         </label>
       </div>
 
-      <Button variant="hero" size="lg" className="w-full">
+      <Button variant="hero" size="lg" className="w-full" onClick={handleSubmit}>
         Submit Tutor Application
       </Button>
     </>
@@ -565,7 +769,7 @@ const ToastError = ({ t, title, message }) => (
       {/* <svg className="w-7 h-7 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z" />
       </svg> */}
-      <XCircle size={32}  strokeWidth={2.5} className="text-white/80 hover:text-white cursor-pointer transition" onClick={() => toast.dismiss(t)} />
+      <XCircle size={32} strokeWidth={2.5} className="text-white/80 hover:text-white cursor-pointer transition" onClick={() => toast.dismiss(t)} />
       <div>
         <p className="font-semibold">{title}</p>
         <p className="text-sm">{message}</p>

@@ -58,8 +58,7 @@ const Login = () => {
         } else {
           console.log("⚠️ No user document found in Firestore");
         }
-        console.log(userCredential.user.uid)
-        navigate(`/${loginType}`);
+        navigate(`/${loginType}/${user.uid}`);
         return true;
 
       })
