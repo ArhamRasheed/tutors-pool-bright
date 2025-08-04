@@ -14,7 +14,7 @@ export const loginUser = async (
     const user = userCredential.user;
 
     // Step 2: Check Firestore if user has a profile
-    const userRef = doc(db, "students", user.uid);
+    const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
