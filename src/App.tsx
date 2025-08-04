@@ -11,6 +11,8 @@ import NotFound from "./pages/NotFound.tsx";
 import StudentProfile from "./pages/Student/StudentProfile.tsx";
 import StudentDashboard from "./pages/Student/StudentDashboard.tsx";
 import Flashcards from "./pages/Flashcards.tsx";
+import Chat from "./pages/Chat.tsx";
+import EnhancedIndex from "./pages/EnhancedIndex.tsx";
 
 const queryClient = new QueryClient();
 
@@ -21,12 +23,13 @@ const App = () => (
       <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<EnhancedIndex />} />
             <Route path="/login" element={<Login />} />
             <Route path="/join" element={<JoinFree />} />
             <Route path="/student" element={<StudentProfile />} />
             <Route path="/student/dashboard" element={<StudentDashboard />} />
             <Route path="/flashcards" element={<Flashcards />} />
+            <Route path="/chats" element={<Chat />} />
             {/* <Route path="/tutor-profile" element={<TutorProfile/> */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

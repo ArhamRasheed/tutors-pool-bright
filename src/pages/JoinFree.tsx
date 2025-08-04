@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, provider, db } from "../lib/firebase.js";
-import { signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithPopup} from "firebase/auth";
 import { User, Mail, Lock, BookOpen, GraduationCap, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -148,15 +149,30 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
       return;
     }
 
-    const { success, error } = await submitUser(formData, "student");
+    try {
+    // Step 1: Create user with Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      formData.email,
+      formData.password
+    );
+
+    const uid = userCredential.user.uid;
+
+    // Step 2: Store user data in Firestore with UID as ID
+    const { success, error } = await submitUser(uid, formData, "student",);
+
     if (success) {
       alert("Student account created successfully.");
-      // Optional: Redirect or clear for
       navigate("/student");
     } else {
-      alert("Failed to create account. " + error.message);
+      alert("Failed to save data: " + error.message);
     }
-  };
+  } catch (err: any) {
+    alert("Signup failed: " + err.message);
+  }
+
+};
 
   return (
     <>
@@ -335,14 +351,29 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       return;
     }
 
-    const { success, error } = await submitUser(tutorData, "tutor");
+    try {
+    // Step 1: Create tutor in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      tutorData.email,
+      tutorData.password
+    );
+
+    const uid = userCredential.user.uid;
+
+    // Step 2: Store tutor data in Firestore using UID as document ID
+    const { success, error } = await submitUser(uid, tutorData, "tutor");
+
     if (success) {
       alert("Tutor application submitted! You will be notified upon approval.");
-      // optional: redirect or clear form
+      // Optional: redirect or clear form
     } else {
       alert("Failed to submit application. " + error.message);
     }
-  };
+  } catch (err: any) {
+    alert("Signup failed: " + err.message);
+  }
+};
 
 
   return (
