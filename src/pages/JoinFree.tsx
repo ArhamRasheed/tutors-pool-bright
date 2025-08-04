@@ -9,10 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../lib/firebase";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { toast } from "sonner";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import {XCircle} from 'lucide-react';
 
 
 
@@ -73,7 +75,7 @@ const JoinFree = () => {
                 />
               </TabsContent>
 
-              {/* <TabsContent value="tutor" className="space-y-6 mt-6">
+              {<TabsContent value="tutor" className="space-y-6 mt-6">
                 <TutorForm
                   showPassword={showPassword}
                   setShowPassword={setShowPassword}
@@ -82,7 +84,7 @@ const JoinFree = () => {
                   subjects={subjects}
                   grades={grades}
                 />
-              </TabsContent> */}
+              </TabsContent>}
             </Tabs>
           </CardContent>
         </Card>
@@ -206,13 +208,16 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
 
 
   const submitUser = async (data: any, userType: "student" | "tutor") => {
+
     try {
-      const docRef = await addDoc(collection(db, userType + "s"), {
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+      const docRef = await setDoc(doc(db, userType + "s", user.uid), {
         ...data,
         createdAt: serverTimestamp(),
         role: userType,
       });
-      return { success: true, id: docRef.id };
+      return { success: true, id: user.uid };
     }
     catch (error) {
       console.error("Error submitting user:", error);
@@ -302,7 +307,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
             <SelectValue placeholder="Select your grade level" />
           </SelectTrigger>
           <SelectContent>
-            {grades.map((grade) => (
+            {grades.map((grade: string) => (
               <SelectItem key={grade} value={grade.toLowerCase()}>{grade}</SelectItem>
             ))}
           </SelectContent>
@@ -335,8 +340,8 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
                 <div
                   key={id}
                   className={`flex items-center border rounded-md px-3 py-2 cursor-pointer transition-colors ${isChecked
-                      ? "bg-muted border-primary"
-                      : "hover:bg-accent"
+                    ? "bg-muted border-primary"
+                    : "hover:bg-accent"
                     }`}
                   onClick={() => handleSubjectToggle(subject, !isChecked)}
                 >
@@ -404,7 +409,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
   );
 };
 
-/*const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
+const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
   return (
     <>
       <div className="bg-accent/50 rounded-lg p-4 mb-4">
@@ -537,16 +542,17 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
       </Button>
     </>
   );
-};*/
+};
 const ToastError = ({ t, title, message }) => (
   <div
     className="bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-start justify-between gap-4 w-full max-w-sm font-medium font-sans"
     onClick={() => toast.dismiss(t)}
   >
     <div className="flex items-start gap-3">
-      <svg className="w-7 h-7 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      {/* <svg className="w-7 h-7 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z" />
-      </svg>
+      </svg> */}
+      <XCircle size={32}  strokeWidth={2.5} className="text-white/80 hover:text-white cursor-pointer transition" onClick={() => toast.dismiss(t)} />
       <div>
         <p className="font-semibold">{title}</p>
         <p className="text-sm">{message}</p>
@@ -555,7 +561,9 @@ const ToastError = ({ t, title, message }) => (
         </div>
       </div>
     </div>
-    <button onClick={() => toast.dismiss(t)} className="text-white hover:text-gray-100">✕</button>
+
+    {/* <XCircle color="red" size={24} onClick={() => toast.dismiss(t)} className="text-white hover:text-gray-100"/> */}
+    {/* <button onClick={() => toast.dismiss(t)} className="text-white hover:text-gray-100">✕</button> */}
   </div>
 );
 
