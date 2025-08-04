@@ -9,16 +9,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { submitUser } from "../lib/submitUser";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { toast } from "sonner";
+
 
 
 const JoinFree = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [accountType, setAccountType] = useState("student");
-  
+
+  // const location = useLocation();
+  // const message = location.state?.message;
   const subjects = [
-    "Mathematics", "Physics", "Chemistry", "Biology", 
+    "Mathematics", "Physics", "Chemistry", "Biology",
     "Economics", "English Literature", "Computer Science", "History"
   ];
 
@@ -27,6 +33,7 @@ const JoinFree = () => {
   ];
 
   return (
+
     <div className="min-h-screen bg-gradient-section py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
@@ -54,10 +61,10 @@ const JoinFree = () => {
                   Tutor
                 </TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="student" className="space-y-6 mt-6">
-                <StudentForm 
-                  showPassword={showPassword} 
+                <StudentForm
+                  showPassword={showPassword}
                   setShowPassword={setShowPassword}
                   showConfirmPassword={showConfirmPassword}
                   setShowConfirmPassword={setShowConfirmPassword}
@@ -65,17 +72,17 @@ const JoinFree = () => {
                   grades={grades}
                 />
               </TabsContent>
-              
-              <TabsContent value="tutor" className="space-y-6 mt-6">
-                <TutorForm 
-                  showPassword={showPassword} 
+
+              {/* <TabsContent value="tutor" className="space-y-6 mt-6">
+                <TutorForm
+                  showPassword={showPassword}
                   setShowPassword={setShowPassword}
                   showConfirmPassword={showConfirmPassword}
                   setShowConfirmPassword={setShowConfirmPassword}
                   subjects={subjects}
                   grades={grades}
                 />
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </CardContent>
         </Card>
@@ -94,7 +101,22 @@ const JoinFree = () => {
 };
 
 const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
-  
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+
+  const handleSubjectToggle = (subject: string, isChecked: boolean) => {
+    const updatedSubjects = isChecked
+      ? [...selectedSubjects, subject]
+      : selectedSubjects.filter((s) => s !== subject);
+
+    // Update UI state
+    setSelectedSubjects(updatedSubjects);
+
+    // Update form data
+    setFormData((prev) => ({
+      ...prev,
+      subject: updatedSubjects,
+    }));
+  };
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -102,7 +124,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     password: "",
     confirmPassword: "",
     grade: "",
-    subject: "",
+    subject: [],
     agreed: false
   });
 
@@ -115,9 +137,61 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
       alert("You must agree to Terms and Privacy Policy.");
       return;
     }
+    if (!formData.firstName) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Missing First Name" message="Please enter your first name." />
+      ), { duration: 3000 });
+      return;
+    }
 
+    if (!formData.lastName) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Missing Last Name" message="Please enter your last name." />
+      ), { duration: 3000 });
+      return;
+    }
+
+    if (!formData.email) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Missing Email" message="Please enter your email." />
+      ), { duration: 3000 });
+      return;
+    }
+    if (!formData.grade) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Missing Grade" message="Please enter your grade." />
+      ), { duration: 3000 });
+      return;
+    }
+    if (formData.subject.length == 0) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Missing Subject(s)" message="Please enter your Subjects (At least 1 is needed)." />
+      ), { duration: 3000 });
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match.");
+      return;
+    }
+
+    if (!formData.password) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Missing Password" message="Please enter your password." />
+      ), { duration: 3000 });
+      return;
+    }
+
+    if (!formData.confirmPassword) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Missing Confirmation" message="Please confirm your password." />
+      ), { duration: 3000 });
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.custom((t) => (
+        <ToastError t={t} title="Incorrect Password" message="Please choose longer password" />
+      ), { duration: 3000 });
       return;
     }
 
@@ -130,6 +204,21 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     }
   };
 
+
+  const submitUser = async (data: any, userType: "student" | "tutor") => {
+    try {
+      const docRef = await addDoc(collection(db, userType + "s"), {
+        ...data,
+        createdAt: serverTimestamp(),
+        role: userType,
+      });
+      return { success: true, id: docRef.id };
+    }
+    catch (error) {
+      console.error("Error submitting user:", error);
+      return { success: false, error };
+    }
+  };
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -137,14 +226,14 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
           <Label htmlFor="firstName">First Name</Label>
           <div className="relative">
             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input id="firstName" placeholder="First name" className="pl-10"  value={formData.firstName}
-                onChange={e => handleChange("firstName", e.target.value)} />
+            <Input id="firstName" placeholder="First name" className="pl-10" value={formData.firstName}
+              onChange={e => handleChange("firstName", e.target.value)} required />
           </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="lastName">Last Name</Label>
-          <Input id="lastName" placeholder="Last name"  value={formData.lastName}
-                onChange={e => handleChange("lastName", e.target.value)}/>
+          <Input id="lastName" placeholder="Last name" value={formData.lastName}
+            onChange={e => handleChange("lastName", e.target.value)} required />
         </div>
       </div>
 
@@ -153,7 +242,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input id="email" type="email" placeholder="your@email.com" className="pl-10" value={formData.email}
-            onChange={e => handleChange("email", e.target.value)} />
+            onChange={e => handleChange("email", e.target.value)} required />
         </div>
       </div>
 
@@ -222,30 +311,69 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
 
       <div className="space-y-2">
         <Label htmlFor="subjects">Subjects of Interest</Label>
-        <Select onValueChange={value => handleChange("subject", value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select subjects you want to learn" />
-          </SelectTrigger>
-          <SelectContent>
-            {subjects.map((subject: string) => (
-              <SelectItem key={subject} value={subject.toLowerCase()}>{subject}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              className="w-full justify-between text-black"
+            >
+              {selectedSubjects.length > 0
+                ? selectedSubjects.join(', ')
+                : "Select subjects you want to learn"}
+            </Button>
+          </PopoverTrigger>
+
+          <PopoverContent
+            className="w-[--radix-popover-trigger-width] max-h-64 overflow-y-auto p-2 space-y-1"
+            align="start"
+          >
+            {subjects.map((subject) => {
+              const id = `subject-${subject}`;
+              const isChecked = selectedSubjects.includes(subject);
+              return (
+                <div
+                  key={id}
+                  className={`flex items-center border rounded-md px-3 py-2 cursor-pointer transition-colors ${isChecked
+                      ? "bg-muted border-primary"
+                      : "hover:bg-accent"
+                    }`}
+                  onClick={() => handleSubjectToggle(subject, !isChecked)}
+                >
+                  <Checkbox
+                    id={id}
+                    checked={isChecked}
+                    onCheckedChange={() => { }}
+                    className="mr-2 pointer-events-none"
+                  />
+                  <label
+                    htmlFor={id}
+                    className={`text-sm font-medium leading-none ${isChecked ? "!text-black-600" : "text-black"
+                      }`}
+                  >
+                    {subject}
+                  </label>
+                </div>
+              );
+            })}
+          </PopoverContent>
+        </Popover>
       </div>
 
+
+
       <div className="flex items-center space-x-2">
-        <Checkbox 
-        id="terms" 
-        checked={formData.agreed} 
-        onCheckedChange={(checked) => handleChange("agreed", checked === true)} 
+        <Checkbox
+          id="terms"
+          checked={formData.agreed}
+          onCheckedChange={(checked) => handleChange("agreed", checked === true)}
         />
         <label htmlFor="terms"
           className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
-        I agree to the{" "}
-        <a href="#" className="text-primary hover:underline">Terms of Service</a>{" "}and{" "}
-        <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+          I agree to the{" "}
+          <a href="#" className="text-primary hover:underline">Terms of Service</a>{" "}and{" "}
+          <a href="#" className="text-primary hover:underline">Privacy Policy</a>
         </label>
       </div>
 
@@ -265,10 +393,10 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
 
       <Button variant="outline" size="lg" className="w-full">
         <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+          <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
         </svg>
         Continue with Google
       </Button>
@@ -276,44 +404,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
   );
 };
 
-const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
-  const [tutorData, setTutorData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    qualification: "",
-    experience: "",
-    specialization: "",
-    gradeLevel: "",
-    agreed: false,
-  });
-  
-  const handleTutorChange = (field: string, value: any) => {
-  setTutorData((prev) => ({ ...prev, [field]: value }));
-  };
-  const handleTutorSubmit = async () => {
-    if (!tutorData.agreed) {
-      alert("You must agree to Terms and Privacy Policy.");
-      return;
-    }
-
-    if (tutorData.password !== tutorData.confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    const { success, error } = await submitUser(tutorData, "tutor");
-    if (success) {
-      alert("Tutor application submitted! You will be notified upon approval.");
-      // optional: redirect or clear form
-    } else {
-      alert("Failed to submit application. " + error.message);
-    }
-  };
-
-
+/*const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
   return (
     <>
       <div className="bg-accent/50 rounded-lg p-4 mb-4">
@@ -328,14 +419,12 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
           <Label htmlFor="firstName">First Name</Label>
           <div className="relative">
             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input id="firstName" placeholder="First name" className="pl-10" value={tutorData.firstName}
-              onChange={(e) => handleTutorChange("firstName", e.target.value)}/>
+            <Input id="firstName" placeholder="First name" className="pl-10" />
           </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="lastName">Last Name</Label>
-          <Input id="lastName" placeholder="Last name" className="pl-10" value={tutorData.lastName}
-              onChange={(e) => handleTutorChange("lastName", e.target.value)}/>
+          <Input id="lastName" placeholder="Last name" />
         </div>
       </div>
 
@@ -343,8 +432,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
         <Label htmlFor="email">Email</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input id="email" type="email" placeholder="your@email.com" className="pl-10" value={tutorData.email}
-              onChange={(e) => handleTutorChange("email", e.target.value)}/>
+          <Input id="email" type="email" placeholder="your@email.com" className="pl-10" />
         </div>
       </div>
 
@@ -358,8 +446,6 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
               type={showPassword ? "text" : "password"}
               placeholder="Create password"
               className="pl-10 pr-10"
-              value={tutorData.password}
-              onChange={(e) => handleTutorChange("password", e.target.value)}
             />
             <Button
               type="button"
@@ -381,8 +467,6 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm password"
               className="pl-10 pr-10"
-              value={tutorData.confirmPassword}
-              onChange={(e) => handleTutorChange("confirmPassword", e.target.value)}
             />
             <Button
               type="button"
@@ -399,14 +483,12 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
 
       <div className="space-y-2">
         <Label htmlFor="qualification">Highest Qualification</Label>
-        <Input id="qualification" placeholder="e.g. Masters in Mathematics" value={tutorData.qualification}
-              onChange={(e) => handleTutorChange("qualification", e.target.value)}/>
+        <Input id="qualification" placeholder="e.g. Masters in Mathematics" />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="experience">Teaching Experience (Years)</Label>
-        <Input id="experience" type="number" placeholder="e.g. 5" value={tutorData.experience}
-              onChange={(e) => handleTutorChange("experience", e.target.value)}/>
+        <Input id="experience" type="number" placeholder="e.g. 5" />
       </div>
 
       <div className="space-y-2">
@@ -438,10 +520,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       </div>
 
       <div className="flex items-center space-x-2">
-        <Checkbox id="terms" 
-          checked={tutorData.agreed}
-          onCheckedChange={(checked) => handleTutorChange("agreed", checked)}
-        />
+        <Checkbox id="terms" />
         <label
           htmlFor="terms"
           className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -453,10 +532,31 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
         </label>
       </div>
 
-      <Button variant="hero" size="lg" className="w-full" onClick={handleTutorSubmit}>
+      <Button variant="hero" size="lg" className="w-full">
         Submit Tutor Application
       </Button>
     </>
   );
-};
+};*/
+const ToastError = ({ t, title, message }) => (
+  <div
+    className="bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-start justify-between gap-4 w-full max-w-sm font-medium font-sans"
+    onClick={() => toast.dismiss(t)}
+  >
+    <div className="flex items-start gap-3">
+      <svg className="w-7 h-7 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z" />
+      </svg>
+      <div>
+        <p className="font-semibold">{title}</p>
+        <p className="text-sm">{message}</p>
+        <div className="mt-2 h-1 w-full bg-white/30 rounded overflow-hidden">
+          <div className="h-full bg-white animate-[toastProgress_3s_linear_forwards]" />
+        </div>
+      </div>
+    </div>
+    <button onClick={() => toast.dismiss(t)} className="text-white hover:text-gray-100">✕</button>
+  </div>
+);
+
 export default JoinFree;

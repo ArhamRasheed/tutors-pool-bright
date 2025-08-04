@@ -18,6 +18,13 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+			},
+			fontSize: {
+				base: '16px',
+				lg: '18px',
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -82,6 +89,10 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
+				toastProgress: {
+					'0%': { width: '100%' },
+					'100%': { width: '0%' },
+				},
 				'accordion-down': {
 					from: {
 						height: '0'
@@ -136,6 +147,7 @@ export default {
 				}
 			},
 			animation: {
+				'toastProgress': 'toastProgress 3s linear forwards',
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.6s ease-out',
@@ -145,5 +157,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	//plugins: [require("tailwindcss-animate")],
 } satisfies Config;

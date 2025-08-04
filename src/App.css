@@ -4,7 +4,18 @@
   padding: 2rem;
   text-align: center;
 }
+[data-sonner-toast][data-type="error"] {
+  border-radius: 10px;
+  font-family: sans-serif;
+  background-color: black;
+  color: white;
+}
 
+[data-sonner-toast] .sonner-progress-bar {
+  background-color: rgba(228, 8, 8, 0.92);
+  height: 3px;
+  bottom: 0;
+}
 .logo {
   height: 6em;
   padding: 1.5em;
