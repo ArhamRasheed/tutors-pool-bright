@@ -14,7 +14,10 @@ import { auth, db } from "../lib/firebase";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import {XCircle} from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { error } from "console";
 
 
 
@@ -129,6 +132,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     subject: [],
     agreed: false
   });
+  const navigate = useNavigate();
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -197,10 +201,17 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
       return;
     }
 
-    const { success, error } = await submitUser(formData, "student");
+    const { success, error, id } = await submitUser(formData, "student");
     if (success) {
       alert("Student account created successfully.");
       // Optional: Redirect or clear form
+      if(id){
+        const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
+        navigate(`/student/${id}`);
+      }
+      else{
+        console.log("Id not found!");
+      }
     } else {
       alert("Failed to create account. " + error.message);
     }
@@ -216,12 +227,14 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         ...data,
         createdAt: serverTimestamp(),
         role: userType,
+        uid: user.uid,
+        streak: 0,
       });
-      return { success: true, id: user.uid };
+      return { success: true, error: false, id: user.uid};
     }
     catch (error) {
       console.error("Error submitting user:", error);
-      return { success: false, error };
+      return { success: false, error, id: null };
     }
   };
   return (
@@ -308,7 +321,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
           </SelectTrigger>
           <SelectContent>
             {grades.map((grade: string) => (
-              <SelectItem key={grade} value={grade.toLowerCase()}>{grade}</SelectItem>
+              <SelectItem key={grade} value={grade.toLocaleUpperCase()}>{grade}</SelectItem>
             ))}
           </SelectContent>
         </Select>

@@ -19,7 +19,6 @@ const Login = () => {
   const [loginType, setLoginType] = useState("student");
   const [accountNotFound, setAccountNotFound] = useState(false);
 
-
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
@@ -35,6 +34,8 @@ const Login = () => {
 
       console.log("Signed in user:", user);
       // Optionally redirect to /dashboard
+      navigate(`/${loginType}`);
+      return true;
     } catch (error) {
       console.error("Login error:", error.message);
     }
@@ -58,6 +59,7 @@ const Login = () => {
           console.log("⚠️ No user document found in Firestore");
         }
         console.log(userCredential.user.uid)
+        navigate(`/${loginType}`);
         return true;
 
       })
