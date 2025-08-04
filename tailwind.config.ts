@@ -89,10 +89,6 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
-				toastProgress: {
-					'0%': { width: '100%' },
-					'100%': { width: '0%' },
-				},
 				'accordion-down': {
 					from: {
 						height: '0'
@@ -147,7 +143,6 @@ export default {
 				}
 			},
 			animation: {
-				'toastProgress': 'toastProgress 3s linear forwards',
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.6s ease-out',
