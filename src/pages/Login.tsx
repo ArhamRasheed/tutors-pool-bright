@@ -36,7 +36,7 @@ const Login = () => {
       // Optionally redirect to /dashboard
       navigate(`/${loginType}`);
       return true;
-    } catch (error) {
+    } catch (error) { 
       console.error("Login error:", error.message);
     }
     finally {
