@@ -17,6 +17,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { XCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import { CountryStateCitySelector } from "@/components/CountryStateCitySelector";
 import { error } from "console";
 
 
@@ -29,7 +30,7 @@ const JoinFree = () => {
   // const location = useLocation();
   // const message = location.state?.message;
   const subjects = [
-    "Mathematics", "Physics", "Chemistry", "Biology",
+    "Mathematics", "Physics", "Chemistry", "Biology", "Additional Mathematics",
     "Economics", "English Literature", "Computer Science", "History"
   ];
 
@@ -108,7 +109,6 @@ const JoinFree = () => {
 const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [instituteType, setInstituteType] = useState(""); // "School" or "College"
-  const [instituteName, setInstituteName] = useState("");
   const handleSubjectToggle = (subject: string, isChecked: boolean) => {
     const updatedSubjects = isChecked
       ? [...selectedSubjects, subject]
@@ -131,7 +131,11 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     confirmPassword: "",
     grade: "",
     subject: [],
-    agreed: false
+    agreed: false,
+    country: "",
+    state: "",
+    city: "",
+    zipCode: "",
   });
   const navigate = useNavigate();
 
@@ -413,6 +417,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         </Popover>
       </div>
 
+      <CountryStateCitySelector formData={formData} setFormData={setFormData} />
 
 
       <div className="flex items-center space-x-2">
@@ -472,6 +477,10 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     grade: "",
     agreed: false,
     courses: [],
+    country: "",
+    state: "",
+    city: "",
+    zipCode: "",
   });
 
   const navigate = useNavigate();
@@ -691,6 +700,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
             </Button>
           </PopoverTrigger>
 
+
           <PopoverContent
             className="w-[--radix-popover-trigger-width] max-h-64 overflow-y-auto p-2 space-y-1"
             align="start"
@@ -740,6 +750,9 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
           </SelectContent>
         </Select>
       </div>
+
+      <CountryStateCitySelector formData={formData} setFormData={setFormData} />
+
 
       <div className="flex items-center space-x-2">
         <Checkbox id="terms" checked={formData.agreed} onCheckedChange={(checked) => handleChange("agreed", checked)} />
