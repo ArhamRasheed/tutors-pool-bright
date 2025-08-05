@@ -479,6 +479,10 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     grade: "",
     agreed: false,
     courses: [],
+    country: "",
+    state: "",
+    city: "",
+    zipCode: "",
   });
 
   const navigate = useNavigate();
@@ -508,7 +512,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     if (field === "experience") {
       const numericValue = Number(value);
       if (numericValue > 50) { value = parseInt(String(numericValue)[0]) }
-      
+
     }
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -766,6 +770,8 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
           </SelectContent>
         </Select>
       </div>
+
+      <CountryStateCitySelector formData={formData} setFormData={setFormData} />
 
       <div className="flex items-center space-x-2">
         <Checkbox id="terms" checked={formData.agreed} onCheckedChange={(checked) => handleChange("agreed", checked)} />
