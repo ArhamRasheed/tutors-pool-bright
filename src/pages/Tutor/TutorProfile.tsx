@@ -14,8 +14,15 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Edit, Save, X, Camera, User, BookOpen, GraduationCap, Calendar, Award, ShieldCheck, Plus, Trash2, Book } from 'lucide-react';
 import myimage from '../../assets/images.jpg';
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useEffect } from "react";
 
-// Validation schema
+// Validation
+//  schema
+
+
+
 const tutorProfileSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),

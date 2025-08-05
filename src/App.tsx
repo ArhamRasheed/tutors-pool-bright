@@ -12,7 +12,7 @@ import StudentProfile from "./pages/Student/StudentProfile.tsx";
 import StudentDashboard from "./pages/StudentDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import TutorProfile from "./pages/Tutor/TutorProfile.tsx";
-import TutorProfile_pov from "./pages/Student/TutorProfile_pov.tsx"; 
+import TutorProfileViewForStudents from "./pages/Student/TutorProfileViewForStudents.tsx"; 
 
 const queryClient = new QueryClient();
 
@@ -28,8 +28,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/join" element={<JoinFree />} />
             <Route path="/student/:uid" element={<StudentProfile />} />
-            <Route path="/student/dashboard" element={<StudentDashboard />} />
-            <Route path="/tutor/tutorid" element={<TutorProfile_pov />} />
+            <Route path="/student/:uid/dashboard" element={<StudentDashboard />} />
+            <Route path="/tutor/:uid/view" element={<TutorProfileViewForStudents />} />
             <Route path="/tutor" element={<TutorProfile />} />
             <Route path="*" element={<NotFound />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

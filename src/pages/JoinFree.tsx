@@ -19,6 +19,7 @@ import { XCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { CountryStateCitySelector } from "@/components/CountryStateCitySelector";
 import { error } from "console";
+import { boolean, number } from "zod";
 
 
 
@@ -85,7 +86,7 @@ const JoinFree = () => {
                   setShowPassword={setShowPassword}
                   showConfirmPassword={showConfirmPassword}
                   setShowConfirmPassword={setShowConfirmPassword}
-                  subjects={subjects}
+                  courses={subjects}
                   grades={grades}
                 />
               </TabsContent>}
@@ -462,9 +463,10 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
   );
 };
 
-const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
+const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, courses, grades }: any) => {
 
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [achievements, setAcievements] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -472,35 +474,42 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     password: "",
     confirmPassword: "",
     qualification: "",
-    experience: "",
+    experience: undefined as number,
     specialization: "",
     grade: "",
     agreed: false,
     courses: [],
-    country: "",
-    state: "",
-    city: "",
-    zipCode: "",
   });
 
   const navigate = useNavigate();
 
-  const handleSubjectToggle = (subject: string, isChecked: boolean) => {
-    const updatedSubjects = isChecked
-      ? [...selectedSubjects, subject]
-      : selectedSubjects.filter((s) => s !== subject);
+  const handleAchievementChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      achievements: [value]
+    }));
+  }
+  const handleCoursesToggle = (course: string, isChecked: boolean) => {
+    const updatedCourses = isChecked
+      ? [...selectedCourses, course]
+      : selectedCourses.filter((s) => s !== course);
 
     // Update UI state
-    setSelectedSubjects(updatedSubjects);
+    setSelectedCourses(updatedCourses);
 
     // Update form data
     setFormData((prev) => ({
       ...prev,
-      subject: updatedSubjects,
+      courses: updatedCourses,
     }));
   };
 
   const handleChange = (field: string, value: any) => {
+    if (field === "experience") {
+      const numericValue = Number(value);
+      if (numericValue > 50) { value = parseInt(String(numericValue)[0]) }
+      
+    }
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -550,7 +559,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       alert("Tutor application submitted successfully.");
       if (id) {
         const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
-        navigate(`/tutor/${id}`);
+        navigate(`/tutor/${id}/view`);
       }
     } else {
       alert("Failed to submit tutor application. " + error.message);
@@ -567,7 +576,14 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
         createdAt: serverTimestamp(),
         role: userType,
         uid: user.uid,
-        status: "pending"
+        status: "pending",
+        responseTime: 0,
+        bio: `This is ${data.firstName} ${data.lastName}, Achieved Exellence in ${data.courses.join(', ')}.`,
+        sessionPrice: 0,
+        rating: 0,
+        totalReviews: 0,
+        availability: 'Available'
+
       });
       return { success: true, error: false, id: user.uid };
     }
@@ -667,7 +683,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
 
       <div className="space-y-2">
         <Label htmlFor="experience">Teaching Experience (Years)</Label>
-        <Input id="experience" type="number" placeholder="e.g. 5"
+        <Input id="experience" type="number" placeholder="e.g. 5" min={0} max={50}
           value={formData.experience} onChange={(e) => handleChange("experience", e.target.value)} />
       </div>
 
@@ -686,7 +702,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       </div> */}
 
       <div className="space-y-2">
-        <Label htmlFor="subjects">Courses</Label>
+        <Label htmlFor="courses">Courses</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -694,8 +710,8 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
               role="combobox"
               className="w-full justify-between text-black"
             >
-              {selectedSubjects.length > 0
-                ? selectedSubjects.join(', ')
+              {selectedCourses.length > 0
+                ? selectedCourses.join(', ')
                 : "Please select at least one course you teach"}
             </Button>
           </PopoverTrigger>
@@ -705,9 +721,9 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
             className="w-[--radix-popover-trigger-width] max-h-64 overflow-y-auto p-2 space-y-1"
             align="start"
           >
-            {subjects.map((subject) => {
-              const id = `subject-${subject}`;
-              const isChecked = selectedSubjects.includes(subject);
+            {courses.map((course) => {
+              const id = `course-${course}`;
+              const isChecked = selectedCourses.includes(course);
               return (
                 <div
                   key={id}
@@ -715,7 +731,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
                     ? "bg-muted border-primary"
                     : "hover:bg-accent"
                     }`}
-                  onClick={() => handleSubjectToggle(subject, !isChecked)}
+                  onClick={() => handleCoursesToggle(course, !isChecked)}
                 >
                   <Checkbox
                     id={id}
@@ -728,7 +744,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
                     className={`text-sm font-medium leading-none ${isChecked ? "!text-black-600" : "text-black"
                       }`}
                   >
-                    {subject}
+                    {course}
                   </label>
                 </div>
               );
@@ -750,9 +766,6 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
           </SelectContent>
         </Select>
       </div>
-
-      <CountryStateCitySelector formData={formData} setFormData={setFormData} />
-
 
       <div className="flex items-center space-x-2">
         <Checkbox id="terms" checked={formData.agreed} onCheckedChange={(checked) => handleChange("agreed", checked)} />

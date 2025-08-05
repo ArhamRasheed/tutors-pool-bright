@@ -4,37 +4,66 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Star, 
-  Calendar, 
-  MessageCircle, 
-  BookOpen, 
-  Award, 
+import {
+  Star,
+  Calendar,
+  MessageCircle,
+  BookOpen,
+  Award,
   Clock,
   GraduationCap,
   FileText,
   ArrowLeft
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useEffect, useState } from "react";
 
-const TutorProfile_pov = () => {
-  const { tutorId } = useParams();
+
+const TutorProfileViewForStudents = () => {
+  const  { uid } = useParams();
   // Mock tutor data - would come from API in real app
-  const tutor = {
-    id: tutorId || "1",
-    name: "Dr. Emily Chen",
-    avatar: "/placeholder.svg",
-    title: "Mathematics & Physics Specialist",
-    bio: "Experienced educator with 8+ years teaching A-Level Mathematics and Physics. PhD in Applied Mathematics from Cambridge University. Passionate about helping students achieve their academic goals through personalized learning approaches.",
-    rating: 4.9,
-    totalReviews: 127,
-    subjects: ["Mathematics", "Physics", "Further Mathematics", "Statistics"],
-    availability: "Mon-Fri: 3:00 PM - 8:00 PM, Sat: 10:00 AM - 4:00 PM",
-    achievements: ["PhD Mathematics", "Top 5% Tutor", "500+ Hours Taught"],
-    experience: "8+ years",
-    sessionPrice: "£45/hour",
-    responseTime: "Usually responds within 2 hours"
-  };
+  // const tutor = {
+  //   // id: tutorId || "1",
+  //   // name: "Dr. Emily Chen",
+  //   // avatar: "/placeholder.svg",
+  //   // title: "Mathematics & Physics Specialist",
+  //   // bio: "Experienced educator with 8+ years teaching A-Level Mathematics and Physics. PhD in Applied Mathematics from Cambridge University. Passionate about helping students achieve their academic goals through personalized learning approaches.",
+  //   // rating: 4.9,
+  //   // totalReviews: 127,
+  //   // subjects: ["Mathematics", "Physics", "Further Mathematics", "Statistics"],
+  //   // availability: "Mon-Fri: 3:00 PM - 8:00 PM, Sat: 10:00 AM - 4:00 PM",
+  //   // achievements: ["PhD Mathematics", "Top 5% Tutor", "500+ Hours Taught"],
+  //   // experience: "8+ years",
+  //   // sessionPrice: "£45/hour",
+  //   // responseTime: "Usually responds within 2 hours"
+  // };
+  //const achievements = ["PhD Mathematics", "Top 5% Tutor", "500+ Hours Taught"];
+  //   // experience: "8+ years",
+  const [TutorData, setTutorData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTutorData = async () => {
+      try {
+        const docRef = doc(db, "tutors", uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setTutorData(docSnap.data());
+        } else {
+          console.log("No such tutor!");
+        }
+      } catch (err) {
+        console.error("Error fetching tutors data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTutorData();
+  }, [uid]);
 
   const reviews = [
     {
@@ -56,7 +85,27 @@ const TutorProfile_pov = () => {
       date: "2 months ago"
     }
   ];
-
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Loading tutor profile...
+      </div>
+    );
+  }
+  if (!TutorData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 font-semibold">
+        Failed to load student data.
+      </div>
+    );
+  }
+  if (TutorData.status.toLowerCase() != 'done') {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 font-semibold">
+        Tutor is not yet approved to view
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gradient-section">
       {/* Header */}
@@ -87,37 +136,36 @@ const TutorProfile_pov = () => {
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-start space-x-6">
                   <Avatar className="h-24 w-24 shadow-md">
-                    <AvatarImage src={tutor.avatar} alt={tutor.name} />
+                    <AvatarImage src={TutorData?.avatar} alt={TutorData?.firstName ?? ""} />
                     <AvatarFallback className="text-xl">
-                      {tutor.name.split(' ').map(n => n[0]).join('')}
+                     {TutorData?.firstName?.[0] + TutorData?.lastName?.[0]}
                     </AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1 space-y-3">
                     <div>
-                      <h1 className="text-3xl font-bold text-foreground">{tutor.name}</h1>
-                      <p className="text-lg text-muted-foreground">{tutor.title}</p>
+                      <h1 className="text-3xl font-bold text-foreground">{TutorData.firstName + " " +  TutorData.lastName}</h1>
+                      <p className="text-lg text-muted-foreground">{ TutorData.status.charAt(0).toUpperCase() + TutorData.status.slice(1).toLowerCase()}</p>
                     </div>
                     
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <Star 
-                            key={star} 
-                            className={`h-5 w-5 ${
-                              star <= Math.floor(tutor.rating) 
-                                ? "text-yellow-400 fill-current" 
+                          <Star
+                            key={star}
+                            className={`h-5 w-5 ${star <= Math.floor(TutorData.rating)
+                                ? "text-yellow-400 fill-current"
                                 : "text-muted-foreground"
-                            }`} 
+                              }`}
                           />
                         ))}
-                        <span className="font-semibold text-foreground">{tutor.rating}</span>
-                        <span className="text-muted-foreground">({tutor.totalReviews} reviews)</span>
+                        <span className="font-semibold text-foreground">{TutorData.rating}</span>
+                        <span className="text-muted-foreground">({TutorData.totalReviews} reviews)</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2">
-                      {tutor.subjects.map((subject) => (
+                      {TutorData.courses.map((subject) => (
                         <Badge key={subject} variant="secondary" className="bg-gradient-primary text-white">
                           {subject}
                         </Badge>
@@ -125,15 +173,15 @@ const TutorProfile_pov = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold">About</h3>
-                  <p className="text-muted-foreground leading-relaxed">{tutor.bio}</p>
+                  <p className="text-muted-foreground leading-relaxed">{TutorData.bio}</p>
                 </div>
               </div>
-              
+
               {/* Quick Stats & Actions */}
               <div className="space-y-4">
                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
@@ -142,32 +190,32 @@ const TutorProfile_pov = () => {
                       <Clock className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">Experience</span>
                     </div>
-                    <p className="text-lg font-semibold">{tutor.experience}</p>
+                    <p className="text-lg font-semibold">{TutorData.experience + " Years"}</p>
                   </div>
-                  
+
                   <div className="p-4 rounded-2xl bg-gradient-section shadow-md">
                     <div className="flex items-center space-x-2 mb-1">
                       <BookOpen className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">Price</span>
                     </div>
-                    <p className="text-lg font-semibold">{tutor.sessionPrice}</p>
+                    <p className="text-lg font-semibold">{TutorData.sessionPrice}</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <Button size="lg" className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300">
                     <Calendar className="h-5 w-5 mr-2" />
                     Book Session
                   </Button>
-                  
+
                   <Button variant="outline" size="lg" className="w-full hover:bg-primary hover:text-primary-foreground transition-all duration-300">
                     <MessageCircle className="h-5 w-5 mr-2" />
                     Message Tutor
                   </Button>
                 </div>
-                
+
                 <div className="p-4 rounded-2xl bg-muted/30 border border-border">
-                  <p className="text-sm text-muted-foreground text-center">{tutor.responseTime}</p>
+                  <p className="text-sm text-muted-foreground text-center">{TutorData.responseTime}</p>
                 </div>
               </div>
             </div>
@@ -181,7 +229,7 @@ const TutorProfile_pov = () => {
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="availability">
             <Card className="shadow-elegant bg-card/50 backdrop-blur-sm border-border">
               <CardHeader>
@@ -194,7 +242,7 @@ const TutorProfile_pov = () => {
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-gradient-section">
                     <p className="font-medium mb-2">Current Schedule:</p>
-                    <p className="text-muted-foreground">{tutor.availability}</p>
+                    <p className="text-muted-foreground">{TutorData.availability}</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     Book a session to see real-time availability and schedule your preferred time slot.
@@ -203,7 +251,7 @@ const TutorProfile_pov = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="achievements">
             <Card className="shadow-elegant bg-card/50 backdrop-blur-sm border-border">
               <CardHeader>
@@ -214,7 +262,7 @@ const TutorProfile_pov = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {tutor.achievements.map((achievement, index) => (
+                  {TutorData.achievements.map((achievement, index) => (
                     <div key={index} className="flex items-center space-x-3 p-4 rounded-xl bg-gradient-section">
                       <div className="p-2 rounded-lg bg-gradient-primary shadow-sm">
                         <GraduationCap className="h-4 w-4 text-white" />
@@ -226,7 +274,7 @@ const TutorProfile_pov = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="reviews">
             <Card className="shadow-elegant bg-card/50 backdrop-blur-sm border-border">
               <CardHeader>
@@ -235,7 +283,7 @@ const TutorProfile_pov = () => {
                   <span>Student Reviews</span>
                 </CardTitle>
                 <CardDescription>
-                  What students say about {tutor.name.split(' ')[1]}
+                  What students say about {TutorData.firstName + " " + TutorData.lastName}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -247,13 +295,12 @@ const TutorProfile_pov = () => {
                           <span className="font-medium">{review.student}</span>
                           <div className="flex items-center">
                             {[1, 2, 3, 4, 5].map((star) => (
-                              <Star 
-                                key={star} 
-                                className={`h-3 w-3 ${
-                                  star <= review.rating 
-                                    ? "text-yellow-400 fill-current" 
+                              <Star
+                                key={star}
+                                className={`h-3 w-3 ${star <= review.rating
+                                    ? "text-yellow-400 fill-current"
                                     : "text-muted-foreground"
-                                }`} 
+                                  }`}
                               />
                             ))}
                           </div>
@@ -273,4 +320,4 @@ const TutorProfile_pov = () => {
   );
 };
 
-export default TutorProfile_pov;
+export default TutorProfileViewForStudents;
