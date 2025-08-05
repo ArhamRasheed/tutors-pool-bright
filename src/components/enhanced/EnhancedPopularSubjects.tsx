@@ -1,10 +1,13 @@
 import { Calculator, Atom, FlaskConical, Dna, TrendingUp, BookOpen, Globe, Code } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FadeInSection } from "@/components/FadeInSection";
 
 const EnhancedPopularSubjects = () => {
+  const navigate = useNavigate();
+
   const subjects = [
     {
       icon: Calculator,
@@ -88,6 +91,11 @@ const EnhancedPopularSubjects = () => {
     }
   ];
 
+  const handleExploreCourse = (subjectTitle: string) => {
+    // Navigate to course details with subject title as parameter
+    navigate(`/course/${subjectTitle.toLowerCase().replace(/\s+/g, '-')}`);
+  };
+
   return (
     <section id="courses" className="py-20 bg-white relative overflow-hidden">
       {/* Background Elements */}
@@ -145,6 +153,7 @@ const EnhancedPopularSubjects = () => {
                   <Button 
                     variant="outline" 
                     className="w-full group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300"
+                    onClick={() => handleExploreCourse(subject.title)}
                   >
                     Explore Course
                   </Button>
