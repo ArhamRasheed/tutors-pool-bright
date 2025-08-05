@@ -138,14 +138,14 @@ const TutorProfileViewForStudents = () => {
                   <Avatar className="h-24 w-24 shadow-md">
                     <AvatarImage src={TutorData?.avatar} alt={TutorData?.firstName ?? ""} />
                     <AvatarFallback className="text-xl">
-                     {TutorData?.firstName?.[0] + TutorData?.lastName?.[0]}
+                     {TutorData?.firstName?.[0] ?? "" + TutorData?.lastName?.[0] ?? ""}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1 space-y-3">
                     <div>
-                      <h1 className="text-3xl font-bold text-foreground">{TutorData.firstName + " " +  TutorData.lastName}</h1>
-                      <p className="text-lg text-muted-foreground">{ TutorData.status.charAt(0).toUpperCase() + TutorData.status.slice(1).toLowerCase()}</p>
+                      <h1 className="text-3xl font-bold text-foreground">{TutorData?.firstName ?? "" + " " +  TutorData?.lastName ?? ""}</h1>
+                      <p className="text-lg text-muted-foreground">{ TutorData?.status.charAt(0).toUpperCase() ?? "" + TutorData?.status.slice(1).toLowerCase() ?? ""}</p>
                     </div>
                     
                     <div className="flex items-center space-x-4">
@@ -153,21 +153,21 @@ const TutorProfileViewForStudents = () => {
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
                             key={star}
-                            className={`h-5 w-5 ${star <= Math.floor(TutorData.rating)
+                            className={`h-5 w-5 ${star <= Math.floor(TutorData.rating ?? 0)
                                 ? "text-yellow-400 fill-current"
                                 : "text-muted-foreground"
                               }`}
                           />
                         ))}
-                        <span className="font-semibold text-foreground">{TutorData.rating}</span>
-                        <span className="text-muted-foreground">({TutorData.totalReviews} reviews)</span>
+                        <span className="font-semibold text-foreground">{TutorData?.rating ?? ""}</span>
+                        <span className="text-muted-foreground">({TutorData?.totalReviews ?? " "} reviews)</span>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      {TutorData.courses.map((subject) => (
+                      {TutorData.courses?.map((subject) => (
                         <Badge key={subject} variant="secondary" className="bg-gradient-primary text-white">
-                          {subject}
+                          {subject ?? ""}
                         </Badge>
                       ))}
                     </div>
@@ -178,7 +178,7 @@ const TutorProfileViewForStudents = () => {
 
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold">About</h3>
-                  <p className="text-muted-foreground leading-relaxed">{TutorData.bio}</p>
+                  <p className="text-muted-foreground leading-relaxed">{TutorData.bio ?? ""}</p>
                 </div>
               </div>
 
@@ -190,7 +190,7 @@ const TutorProfileViewForStudents = () => {
                       <Clock className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">Experience</span>
                     </div>
-                    <p className="text-lg font-semibold">{TutorData.experience + " Years"}</p>
+                    <p className="text-lg font-semibold">{TutorData.experience ?? "" + " Years"}</p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-gradient-section shadow-md">
@@ -198,7 +198,7 @@ const TutorProfileViewForStudents = () => {
                       <BookOpen className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">Price</span>
                     </div>
-                    <p className="text-lg font-semibold">{TutorData.sessionPrice}</p>
+                    <p className="text-lg font-semibold">{TutorData.sessionPrice ?? ""}</p>
                   </div>
                 </div>
 
