@@ -99,6 +99,13 @@ const TutorProfileViewForStudents = () => {
       </div>
     );
   }
+  if (TutorData.status.toLowerCase() != 'done') {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 font-semibold">
+        Tutor is not yet approved to view
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gradient-section">
       {/* Header */}
@@ -138,7 +145,7 @@ const TutorProfileViewForStudents = () => {
                   <div className="flex-1 space-y-3">
                     <div>
                       <h1 className="text-3xl font-bold text-foreground">{TutorData.firstName + " " +  TutorData.lastName}</h1>
-                      <p className="text-lg text-muted-foreground">{TutorData.status}</p>
+                      <p className="text-lg text-muted-foreground">{ TutorData.status.charAt(0).toUpperCase() + TutorData.status.slice(1).toLowerCase()}</p>
                     </div>
                     
                     <div className="flex items-center space-x-4">
