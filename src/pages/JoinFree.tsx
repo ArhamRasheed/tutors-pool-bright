@@ -106,10 +106,10 @@ const JoinFree = () => {
   );
 };
 
-const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
+const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades, handleGoogleLogin }: any) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [instituteType, setInstituteType] = useState(""); // "School" or "College"
-  const [instituteName, setInstituteName] = useState("");
+  //const [instituteName, setInstituteName] = useState("");
   const handleSubjectToggle = (subject: string, isChecked: boolean) => {
     const updatedSubjects = isChecked
       ? [...selectedSubjects, subject]
@@ -132,7 +132,10 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     confirmPassword: "",
     grade: "",
     subject: [],
-    agreed: false
+    agreed: false,
+    instituteType: "",
+    instituteName: ""
+
   });
   const navigate = useNavigate();
 
@@ -562,7 +565,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       alert("Failed to submit tutor application. " + error.message);
     }
   };
-
+  
   const submitUser = async (data: any, userType: "student" | "tutor") => {
 
     try {
