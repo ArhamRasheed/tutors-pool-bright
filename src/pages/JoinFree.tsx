@@ -17,6 +17,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { XCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import { CountryStateCitySelector } from "@/components/CountryStateCitySelector";
 import { error } from "console";
 import { boolean, number } from "zod";
 
@@ -30,7 +31,7 @@ const JoinFree = () => {
   // const location = useLocation();
   // const message = location.state?.message;
   const subjects = [
-    "Mathematics", "Physics", "Chemistry", "Biology",
+    "Mathematics", "Physics", "Chemistry", "Biology", "Additional Mathematics",
     "Economics", "English Literature", "Computer Science", "History"
   ];
 
@@ -109,7 +110,6 @@ const JoinFree = () => {
 const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades, handleGoogleLogin }: any) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [instituteType, setInstituteType] = useState(""); // "School" or "College"
-  //const [instituteName, setInstituteName] = useState("");
   const handleSubjectToggle = (subject: string, isChecked: boolean) => {
     const updatedSubjects = isChecked
       ? [...selectedSubjects, subject]
@@ -132,10 +132,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     confirmPassword: "",
     grade: "",
     subject: [],
-    agreed: false,
-    instituteType: "",
-    instituteName: ""
-
+    agreed: false
   });
   const navigate = useNavigate();
 
@@ -417,6 +414,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         </Popover>
       </div>
 
+      <CountryStateCitySelector formData={formData} setFormData={setFormData} />
 
 
       <div className="flex items-center space-x-2">
@@ -477,8 +475,10 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     grade: "",
     agreed: false,
     courses: [],
-    achievements: [],
-    hasAchievement: false
+    country: "",
+    state: "",
+    city: "",
+    zipCode: "",
   });
 
   const navigate = useNavigate();
@@ -508,7 +508,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     if (field === "experience") {
       const numericValue = Number(value);
       if (numericValue > 50) { value = parseInt(String(numericValue)[0]) }
-      
+
     }
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -716,6 +716,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
             </Button>
           </PopoverTrigger>
 
+
           <PopoverContent
             className="w-[--radix-popover-trigger-width] max-h-64 overflow-y-auto p-2 space-y-1"
             align="start"
@@ -765,46 +766,8 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
           </SelectContent>
         </Select>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="hasAchievement">Any Notable Achievement?</Label>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="hasAchievement"
-              value="yes"
-              checked={formData.hasAchievement === true}
-              onChange={() => handleChange("hasAchievement", true)}
-            />
-            Yes
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="hasAchievement"
-              value="no"
-              checked={formData.hasAchievement === false}
-              onChange={() => handleChange("hasAchievement", false)}
-            />
-            No
-          </label>
-        </div>
 
-        {formData.hasAchievement && (
-          <>
-            <Input
-              id="achievement"
-              type="text"
-              placeholder="e.g. Won National Science Olympiad"
-              value={formData.achievements[0] || ""}
-              onChange={(e) => handleAchievementChange(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              You can add more in the dashboard section later.
-            </p>
-          </>
-        )}
-      </div>
+      <CountryStateCitySelector formData={formData} setFormData={setFormData} />
 
       <div className="flex items-center space-x-2">
         <Checkbox id="terms" checked={formData.agreed} onCheckedChange={(checked) => handleChange("agreed", checked)} />

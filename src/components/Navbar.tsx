@@ -24,16 +24,15 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled 
-        ? "bg-background/80 backdrop-blur-lg border-b border-border shadow-elegant h-16" 
-        : "bg-transparent h-20"
-    }`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+      ? "bg-background/80 backdrop-blur-lg border-b border-border shadow-elegant h-16"
+      : "bg-transparent h-20"
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-full">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors">
+          <div className="flex-shrink-0 ">
+            <Link to="/" className="text-3xl font-bold text-white hover:text-white/90 transition-colors drop-shadow-sm">
               TutorsPool
             </Link>
           </div>
@@ -45,7 +44,7 @@ const Navbar = () => {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
+                  className="text-xl text-blue-1000 text-foreground hover:text-primary transition-colors duration-300 font-medium"
                 >
                   {item.name}
                 </a>
@@ -56,7 +55,7 @@ const Navbar = () => {
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-12px text-gray/20">
                 Log In
               </Button>
             </Link>
@@ -83,7 +82,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <div className="px-2 pt-2 pb-3 space-y-2  sm:px-3">
             {menuItems.map((item) => (
               <a
                 key={item.name}
