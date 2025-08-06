@@ -53,14 +53,14 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 ">
             <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-12px text-gray/20">
+              <Button variant="ghost" size="sm" className="text-12px text-gray/20 space-y-3">
                 Log In
               </Button>
             </Link>
             <Link to="/join">
-              <Button variant="hero" size="sm">
+              <Button variant="hero" size="sm" className="space-y-4">
                 Join for Free
               </Button>
             </Link>
