@@ -64,9 +64,9 @@ export const CountryStateCitySelector = ({ formData, setFormData }: Props) => {
                 <Select
                     onValueChange={(value) => {
                         handleChange("country", value);
+                        fetchStates(value);
                         handleChange("state", "");
                         handleChange("city", "");
-                        fetchStates(value);
                     }}
                 >
                     <SelectTrigger>

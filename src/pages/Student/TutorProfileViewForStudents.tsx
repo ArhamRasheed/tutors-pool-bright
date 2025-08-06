@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 
 
 const TutorProfileViewForStudents = () => {
-  const  { uid } = useParams();
+  const { uid } = useParams();
   // Mock tutor data - would come from API in real app
   // const tutor = {
   //   // id: tutorId || "1",
@@ -138,24 +138,29 @@ const TutorProfileViewForStudents = () => {
                   <Avatar className="h-24 w-24 shadow-md">
                     <AvatarImage src={TutorData?.avatar} alt={TutorData?.firstName ?? ""} />
                     <AvatarFallback className="text-xl">
-                     {TutorData?.firstName?.[0] ?? "" + TutorData?.lastName?.[0] ?? ""}
+                      {TutorData?.firstName?.[0] ?? "" + TutorData?.lastName?.[0] ?? ""}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1 space-y-3">
                     <div>
-                      <h1 className="text-3xl font-bold text-foreground">{TutorData?.firstName ?? "" + " " +  TutorData?.lastName ?? ""}</h1>
-                      <p className="text-lg text-muted-foreground">{ TutorData?.status.charAt(0).toUpperCase() ?? "" + TutorData?.status.slice(1).toLowerCase() ?? ""}</p>
+                      <h1 className="text-3xl font-bold text-foreground">{TutorData?.firstName || TutorData?.lastName
+                        ? `${TutorData?.firstName ?? ""} ${TutorData?.lastName ?? ""}`
+                        : "N/A"}</h1>
+                      <p className="text-lg text-muted-foreground">{TutorData?.status
+                        ? `${TutorData.status.charAt(0).toUpperCase()}${TutorData.status.slice(1).toLowerCase()}`
+                        : "N/A"}
+                      </p>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
                             key={star}
                             className={`h-5 w-5 ${star <= Math.floor(TutorData.rating ?? 0)
-                                ? "text-yellow-400 fill-current"
-                                : "text-muted-foreground"
+                              ? "text-yellow-400 fill-current"
+                              : "text-muted-foreground"
                               }`}
                           />
                         ))}
@@ -298,8 +303,8 @@ const TutorProfileViewForStudents = () => {
                               <Star
                                 key={star}
                                 className={`h-3 w-3 ${star <= review.rating
-                                    ? "text-yellow-400 fill-current"
-                                    : "text-muted-foreground"
+                                  ? "text-yellow-400 fill-current"
+                                  : "text-muted-foreground"
                                   }`}
                               />
                             ))}

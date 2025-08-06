@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { toast } from "sonner";
@@ -20,6 +20,8 @@ import { useNavigate } from "react-router-dom";
 import { CountryStateCitySelector } from "@/components/CountryStateCitySelector";
 import { error } from "console";
 import { boolean, number } from "zod";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { userInfo } from "os";
 
 
 
@@ -107,7 +109,7 @@ const JoinFree = () => {
   );
 };
 
-const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades, handleGoogleLogin }: any) => {
+const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [instituteType, setInstituteType] = useState(""); // "School" or "College"
   const handleSubjectToggle = (subject: string, isChecked: boolean) => {
@@ -124,6 +126,21 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
       subject: updatedSubjects,
     }));
   };
+  const requiredFields = [
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "email", label: "Email" },
+    { key: "password", label: "Password" },
+    { key: "confirmPassword", label: "Confirm Password" },
+    { key: "subject", label: "subject(s)" },
+    { key: "instituteType", label: "Institute Type" },
+    { key: "instituteName", label: "Institute Nmae" },
+    { key: "country", label: "Country" },
+    { key: "city", label: "City" },
+    { key: "state", label: "State" }
+  ];
+
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -132,7 +149,12 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     confirmPassword: "",
     grade: "",
     subject: [],
-    agreed: false
+    agreed: false,
+    instituteType: "",
+    instituteName: "",
+    country: "",
+    state: "",
+    city: ""
   });
   const navigate = useNavigate();
 
@@ -141,58 +163,20 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
   };
 
   const handleSubmit = async () => {
+    for (const { key, label } of requiredFields) {
+      if (!formData[key]) {
+        toast.custom((t) => (
+          <ToastError t={t} title={`Missing ${label}`} message={`Please enter ${label}.`} />
+        ), { duration: 3000 });
+        return;
+      }
+    }
     if (!formData.agreed) {
       alert("You must agree to Terms and Privacy Policy.");
       return;
     }
-    if (!formData.firstName) {
-      toast.custom((t) => (
-        <ToastError t={t} title="Missing First Name" message="Please enter your first name." />
-      ), { duration: 3000 });
-      return;
-    }
-
-    if (!formData.lastName) {
-      toast.custom((t) => (
-        <ToastError t={t} title="Missing Last Name" message="Please enter your last name." />
-      ), { duration: 3000 });
-      return;
-    }
-
-    if (!formData.email) {
-      toast.custom((t) => (
-        <ToastError t={t} title="Missing Email" message="Please enter your email." />
-      ), { duration: 3000 });
-      return;
-    }
-    if (!formData.grade) {
-      toast.custom((t) => (
-        <ToastError t={t} title="Missing Grade" message="Please enter your grade." />
-      ), { duration: 3000 });
-      return;
-    }
-    if (formData.subject.length == 0) {
-      toast.custom((t) => (
-        <ToastError t={t} title="Missing Subject(s)" message="Please enter your Subjects (At least 1 is needed)." />
-      ), { duration: 3000 });
-      return;
-    }
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match.");
-      return;
-    }
-
-    if (!formData.password) {
-      toast.custom((t) => (
-        <ToastError t={t} title="Missing Password" message="Please enter your password." />
-      ), { duration: 3000 });
-      return;
-    }
-
-    if (!formData.confirmPassword) {
-      toast.custom((t) => (
-        <ToastError t={t} title="Missing Confirmation" message="Please confirm your password." />
-      ), { duration: 3000 });
       return;
     }
 
@@ -219,6 +203,54 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
     }
   };
 
+  const handleSignUpWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userDocRef = doc(db, "students", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+
+        toast.custom((t) => (
+          <ToastError t={t} title={`Existing Account Found`} message={`Please Log in.`} />
+        ), { duration: 3000 });
+        return;
+      }
+
+      // First-time signup — create Firestore doc
+      const [firstName, ...rest] = (user.displayName || "").split(" ");
+      const lastName = rest.join(" ");
+
+      await setDoc(userDocRef, {
+        uid: user.uid,
+        firstName: firstName || "",
+        lastName: lastName || "",
+        email: user.email || "",
+        password: "",
+        confirmPassword: "",
+        grade: "",
+        subject: [],
+        agreed: false,
+        instituteType: "",
+        instituteName: "",
+        country: "",
+        state: "",
+        city: "",
+        role: "student",
+        photoURL: user.photoURL || "",
+        createdAt: serverTimestamp(),
+        streak: 0
+      });
+      navigate(`/student/${user.uid}`);
+    }
+    catch (error) {
+      console.error("Google sign-in error:", error);
+      alert("Failed to sign in with Google. " + error.message);
+    }
+  };
 
   const submitUser = async (data: any, userType: "student" | "tutor") => {
 
@@ -446,7 +478,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
         </div>
       </div>
 
-      <Button variant="outline" size="lg" className="w-full">
+      <Button variant="outline" size="lg" className="w-full" onClick={handleSignUpWithGoogle}>
         <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
           <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -462,7 +494,7 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
 const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, courses, grades }: any) => {
 
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-  const [achievements, setAcievements] = useState<string[]>([]);
+  //const [achievements, setAcievements] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -471,7 +503,6 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     confirmPassword: "",
     qualification: "",
     experience: undefined as number,
-    specialization: "",
     grade: "",
     agreed: false,
     courses: [],
@@ -479,6 +510,8 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     state: "",
     city: "",
     zipCode: "",
+    achievements: [],
+    hasAchievement: false
   });
 
   const navigate = useNavigate();
@@ -534,7 +567,7 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
     for (const { key, label } of requiredFields) {
       if (!formData[key]) {
         toast.custom((t) => (
-          <ToastError t={t} title={`Missing ${label}`} message={`Please enter ${label.toLowerCase()}.`} />
+          <ToastError t={t} title={`Missing ${label}`} message={`Please enter ${label}.`} />
         ), { duration: 3000 });
         return;
       }
@@ -565,7 +598,62 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
       alert("Failed to submit tutor application. " + error.message);
     }
   };
-  
+  const handleSignUpWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userDocRef = doc(db, "tutors", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+
+        toast.custom((t) => (
+          <ToastError t={t} title={`Existing Account Found`} message={`Please Log in.`} />
+        ), { duration: 3000 });
+        return;
+      }
+
+      // First-time signup — create Firestore doc
+      const [firstName, ...rest] = (user.displayName || "").split(" ");
+      const lastName = rest.join(" ");
+
+      await setDoc(userDocRef, {
+        uid: user.uid,
+        firstName: firstName || "",
+        lastName: lastName || "",
+        email: user.email || "",
+        password: "",
+        confirmPassword: "",
+        grade: "",
+        courses: [],
+        qualification: "",
+        experience: 0,
+        agreed: true,
+        country: "",
+        state: "",
+        city: "",
+        zipCode: "",
+        role: "tutor",
+        status: "pending",
+        createdAt: serverTimestamp(),
+        achievements: [],
+        hasAchievement: false,
+        responseTime: 0,
+        bio: `This is ${firstName} ${lastName}, Achieved Exellence in ${courses.join(', ')}.`,
+        sessionPrice: 0,
+        rating: 0,
+        totalReviews: 0,
+        availability: 'Available'
+      });
+      navigate(`/tutor/${user.uid}/view`); //initially
+    }
+    catch (error) {
+      console.error("Google sign-up error:", error);
+      alert("Failed to sign up with Google. " + error.message);
+    }
+  };
   const submitUser = async (data: any, userType: "student" | "tutor") => {
 
     try {
@@ -766,6 +854,46 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
           </SelectContent>
         </Select>
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="hasAchievement">Any Notable Achievement?</Label>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="hasAchievement"
+              value="yes"
+              checked={formData.hasAchievement === true}
+              onChange={() => handleChange("hasAchievement", true)}
+            />
+            Yes
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="hasAchievement"
+              value="no"
+              checked={formData.hasAchievement === false}
+              onChange={() => handleChange("hasAchievement", false)}
+            />
+            No
+          </label>
+        </div>
+
+        {formData.hasAchievement === true && (
+          <>
+            <Input
+              id="achievement"
+              type="text"
+              placeholder="e.g. Won National Science Olympiad"
+              value={formData.achievements[0] || ""}
+              onChange={(e) => handleAchievementChange(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              You can add more in the dashboard section later.
+            </p>
+          </>
+        )}
+      </div>
 
       <CountryStateCitySelector formData={formData} setFormData={setFormData} />
 
@@ -784,6 +912,15 @@ const TutorForm = ({ showPassword, setShowPassword, showConfirmPassword, setShow
 
       <Button variant="hero" size="lg" className="w-full" onClick={handleSubmit}>
         Submit Tutor Application
+      </Button>
+      <Button variant="outline" size="lg" className="w-full" onClick={handleSignUpWithGoogle}>
+        <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+          <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+        </svg>
+        Continue with Google
       </Button>
     </>
   );
@@ -812,4 +949,4 @@ const ToastError = ({ t, title, message }) => (
   </div>
 );
 
-export default JoinFree;
+export { JoinFree, ToastError };

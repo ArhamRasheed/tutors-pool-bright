@@ -12,6 +12,8 @@ import { auth, provider, db } from "../lib/firebase.js";
 import { signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { toast } from "sonner";
+import { ToastError } from "./JoinFree.js";
 
 
 const Login = () => {
@@ -28,13 +30,17 @@ const Login = () => {
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
+        toast.custom((t) => (
+          <ToastError t={t} title={`Existing Account Found`} message={`Please Log in.`} />
+        ), { duration: 3000 });
+        return;
         setAccountNotFound(true);
         return false;
       }
 
       console.log("Signed in user:", user);
       // Optionally redirect to /dashboard
-      navigate(`/${loginType}`);
+      navigate(`/${loginType}/${user.uid}`);
       return true;
     } catch (error) { 
       console.error("Login error:", error.message);

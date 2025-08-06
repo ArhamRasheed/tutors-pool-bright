@@ -7,7 +7,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index.tsx";
 import EnhancedIndex from "./pages/EnhancedIndex.tsx";
 import Login from "./pages/Login.tsx";
-import JoinFree from "./pages/JoinFree.tsx";
+import { JoinFree } from "./pages/JoinFree.tsx";
 import StudentProfile from "./pages/Student/StudentProfile.tsx";
 import StudentDashboard from "./pages/StudentDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
