@@ -7,6 +7,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { TutorProfile } from "@/components/TutorProfileCard";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const TutorProfilePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,33 +17,53 @@ const TutorProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
   // Mock data - replace with Firebase call
+  // useEffect(() => {
+  //   const fetchTutorProfile = async () => {
+  //     setLoading(true);
+  //     // Simulate API call
+  //     setTimeout(() => {
+  //       const mockTutor: TutorProfile = {
+  //         id: id || "1",
+  //         name: "Dr. Sarah Ahmed",
+  //         subject: "Mathematics & Physics",
+  //         gradeLevel: "O-Level / A-Level",
+  //         bio: "PhD in Mathematical Physics with 8+ years of teaching experience. I specialize in making complex mathematical concepts accessible and engaging for students. My approach combines theoretical understanding with practical problem-solving techniques that help students excel in their examinations and develop a genuine appreciation for mathematics and physics.",
+  //         rating: 4.9,
+  //         image: "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=400&h=400&fit=crop&crop=face",
+  //         location: "Karachi, Pakistan",
+  //         experience: 8,
+  //         isVerified: true,
+  //         languages: ["English", "Urdu", "Arabic"],
+  //         topics: [
+  //           "Algebra", "Calculus", "Trigonometry", "Statistics",
+  //           "Mechanics", "Thermodynamics", "Electromagnetism", "Wave Physics",
+  //           "Differential Equations", "Linear Algebra", "Quantum Physics"
+  //         ],
+  //         linkedinUrl: "https://linkedin.com/in/sarah-ahmed-phd"
+  //       };
+  //       setTutor(mockTutor);
+  //       setLoading(false);
+  //     }, 1000);
+  //   };
+
+  //   fetchTutorProfile();
+  // }, [id]);
+
   useEffect(() => {
     const fetchTutorProfile = async () => {
+      if (!id) return;
       setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        const mockTutor: TutorProfile = {
-          id: id || "1",
-          name: "Dr. Sarah Ahmed",
-          subject: "Mathematics & Physics",
-          gradeLevel: "O-Level / A-Level",
-          bio: "PhD in Mathematical Physics with 8+ years of teaching experience. I specialize in making complex mathematical concepts accessible and engaging for students. My approach combines theoretical understanding with practical problem-solving techniques that help students excel in their examinations and develop a genuine appreciation for mathematics and physics.",
-          rating: 4.9,
-          image: "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=400&h=400&fit=crop&crop=face",
-          location: "Karachi, Pakistan",
-          experience: 8,
-          isVerified: true,
-          languages: ["English", "Urdu", "Arabic"],
-          topics: [
-            "Algebra", "Calculus", "Trigonometry", "Statistics", 
-            "Mechanics", "Thermodynamics", "Electromagnetism", "Wave Physics",
-            "Differential Equations", "Linear Algebra", "Quantum Physics"
-          ],
-          linkedinUrl: "https://linkedin.com/in/sarah-ahmed-phd"
-        };
-        setTutor(mockTutor);
+      try {
+        const docRef = doc(db, "tutors", id);
+        const snapshot = await getDoc(docRef);
+        if (snapshot.exists()) {
+          setTutor({ id: snapshot.id, ...snapshot.data() } as TutorProfile);
+        }
+      } catch (error) {
+        console.error("Error fetching tutor profile:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchTutorProfile();
@@ -51,11 +73,10 @@ const TutorProfilePage = () => {
     return Array.from({ length: 5 }, (_, index) => (
       <Star
         key={index}
-        className={`h-5 w-5 ${
-          index < Math.floor(rating) 
-            ? "text-yellow-400 fill-yellow-400" 
-            : "text-muted-foreground/30"
-        }`}
+        className={`h-5 w-5 ${index < Math.floor(rating)
+          ? "text-yellow-400 fill-yellow-400"
+          : "text-muted-foreground/30"
+          }`}
       />
     ));
   };
@@ -112,8 +133,8 @@ const TutorProfilePage = () => {
                 </AvatarFallback>
               </Avatar>
               {tutor.isVerified && (
-                <Badge 
-                  variant="default" 
+                <Badge
+                  variant="default"
                   className="absolute -bottom-2 -right-2 bg-accent text-accent-foreground px-3 py-1"
                 >
                   ✓ Verified Tutor
@@ -158,16 +179,16 @@ const TutorProfilePage = () => {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-gradient-primary hover:opacity-90 text-primary-foreground"
                 >
                   <MessageCircle className="h-5 w-5 mr-2" />
                   Book a Session
                 </Button>
                 {tutor.linkedinUrl && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="lg"
                     onClick={() => window.open(tutor.linkedinUrl, '_blank')}
                   >
@@ -206,9 +227,9 @@ const TutorProfilePage = () => {
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {tutor.topics?.map((topic, index) => (
-                    <Badge 
-                      key={index} 
-                      variant="secondary" 
+                    <Badge
+                      key={index}
+                      variant="secondary"
                       className="px-3 py-1 bg-gradient-to-r from-primary/10 to-accent/10 text-foreground hover:from-primary/20 hover:to-accent/20 transition-all"
                     >
                       {topic}
@@ -234,9 +255,9 @@ const TutorProfilePage = () => {
                     <p className="text-sm text-muted-foreground">{tutor.location}</p>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-primary" />
                   <div>
@@ -244,9 +265,9 @@ const TutorProfilePage = () => {
                     <p className="text-sm text-muted-foreground">{tutor.experience}+ years</p>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center gap-3">
                   <Languages className="h-5 w-5 text-primary" />
                   <div>
@@ -268,8 +289,8 @@ const TutorProfilePage = () => {
                   Request This Tutor
                 </Button>
                 {tutor.linkedinUrl && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => window.open(tutor.linkedinUrl, '_blank')}
                   >

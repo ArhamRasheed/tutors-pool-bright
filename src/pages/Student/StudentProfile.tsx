@@ -2,21 +2,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  LayoutDashboard,
-  Calendar,
-  BookOpen,
-  FolderOpen,
-  Brain,
-  MessageCircle,
-  Flame,
-  Clock,
-  GraduationCap,
-  School,
-  Mail,
-  CalendarDays
-} from "lucide-react";
+import { Separator } from "@/components/ui/separator"; 
+import { LayoutDashboard, Calendar, BookOpen, FolderOpen, Brain, MessageCircle, Flame, Clock, GraduationCap, School, Mail, CalendarDays } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";

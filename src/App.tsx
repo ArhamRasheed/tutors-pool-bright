@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound.tsx";
 import TutorProfile from "./pages/Tutor/TutorProfile.tsx";
 import TutorProfileViewForStudents from "./pages/Student/TutorProfileViewForStudents.tsx";
 import TutorProfilePage from "./pages/TutorProfilePage.tsx";
+import { CourseDetails } from "./components/CourseDetails.tsx";
 
 const queryClient = new QueryClient();
 
@@ -21,19 +22,20 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner  position="top-right" richColors={true} closeButton theme="light"/>
+      <Sonner position="top-right" richColors={true} closeButton theme="light" />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<EnhancedIndex />} />
-            <Route path="/original" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/join" element={<JoinFree />} />
-            <Route path="/student/:uid" element={<StudentProfile />} />
-            <Route path="/student/:uid/view" element={<StudentDashboard />} />
-            <Route path="/tutor/:uid/view" element={<TutorProfileViewForStudents />} />
-            <Route path="/tutor/:id" element={<TutorProfilePage />} />
-            <Route path="/tutor/:uid/edit" element={<TutorProfile />} />
-            <Route path="*" element={<NotFound />} />
+          <Route path="/original" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/join" element={<JoinFree />} />
+          <Route path="/student/:uid" element={<StudentProfile />} />
+          <Route path="/student/:uid/view" element={<StudentDashboard />} />
+          <Route path="/tutor/:uid/view" element={<TutorProfileViewForStudents />} />
+          <Route path="/course/:courseId" element={<CourseDetails />} />
+          <Route path="/tutor/:id" element={<TutorProfilePage />} />
+          <Route path="/tutor/:uid/edit" element={<TutorProfile />} />
+          <Route path="*" element={<NotFound />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         </Routes>
       </BrowserRouter>

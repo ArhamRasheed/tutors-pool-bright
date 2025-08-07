@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { Linkedin } from "lucide-react";
+
 
 export interface TutorProfile {
   id: string;
@@ -38,11 +40,10 @@ const TutorProfileCard = ({ tutor, className = "", style }: TutorProfileCardProp
     return Array.from({ length: 5 }, (_, index) => (
       <Star
         key={index}
-        className={`h-3.5 w-3.5 ${
-          index < Math.floor(rating) 
-            ? "text-yellow-400 fill-yellow-400" 
-            : "text-muted-foreground/30"
-        }`}
+        className={`h-3.5 w-3.5 ${index < Math.floor(rating)
+          ? "text-yellow-400 fill-yellow-400"
+          : "text-muted-foreground/30"
+          }`}
       />
     ));
   };
@@ -64,8 +65,8 @@ const TutorProfileCard = ({ tutor, className = "", style }: TutorProfileCardProp
               </AvatarFallback>
             </Avatar>
             {tutor.isVerified && (
-              <Badge 
-                variant="default" 
+              <Badge
+                variant="default"
                 className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs px-2 py-1"
               >
                 ✓ Verified
@@ -82,18 +83,31 @@ const TutorProfileCard = ({ tutor, className = "", style }: TutorProfileCardProp
             <p className="text-muted-foreground text-xs">{tutor.gradeLevel}</p>
           </div>
 
-          {/* Rating */}
+          {/* Rating
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
               {renderStars(tutor.rating)}
             </div>
             <span className="text-sm font-medium text-foreground">{tutor.rating}</span>
-          </div>
+          </div> */}
 
           {/* Bio */}
-          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
+          <p className="text-muted-foreground text-sm leading-relaxed ">
             {tutor.bio}
           </p>
+
+          {tutor.linkedinUrl && (
+            <a
+              href={tutor.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Linkedin className="h-4 w-4" />
+              <span>View LinkedIn</span>
+            </a>
+          )}
 
           {/* Location and Experience */}
           <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
@@ -107,10 +121,11 @@ const TutorProfileCard = ({ tutor, className = "", style }: TutorProfileCardProp
             </div>
           </div>
 
+
           {/* CTA Button */}
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
             onClick={(e) => {
               e.stopPropagation();

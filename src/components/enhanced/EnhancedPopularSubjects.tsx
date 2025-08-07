@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FadeInSection } from "@/components/FadeInSection";
+import { doc, getDocs, collection, query, where } from "firebase/firestore";
+import { db } from "../../lib/firebase";
 
 const EnhancedPopularSubjects = () => {
   const navigate = useNavigate();
@@ -11,7 +13,8 @@ const EnhancedPopularSubjects = () => {
   const subjects = [
     {
       icon: Calculator,
-      title: "Mathematics",
+      id: "igsce-mathematics",
+      title: "IGSCE Mathematics",
       description: "Master algebra, calculus, geometry, and advanced mathematical concepts with expert guidance.",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
@@ -21,7 +24,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Atom,
-      title: "Physics",
+      id: "igsce-physics",
+      title: "IGSCE Physics",
       description: "Understand complex physics principles, mechanics, thermodynamics, and quantum theory.",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
@@ -31,7 +35,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: FlaskConical,
-      title: "Chemistry",
+      id: "igsce-chemistry",
+      title: "IGSCE Chemistry",
       description: "Excel in organic, inorganic, and physical chemistry with practical applications.",
       color: "text-green-600",
       bgColor: "bg-green-50",
@@ -41,7 +46,7 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Dna,
-      title: "Biology",
+      title: "IGSCE Biology",
       description: "Explore life sciences, genetics, ecology, and human anatomy with detailed explanations.",
       color: "text-red-600",
       bgColor: "bg-red-50",
@@ -51,7 +56,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: TrendingUp,
-      title: "Economics",
+      id: "igsce-economics",
+      title: "IGSCE Economics",
       description: "Learn micro and macroeconomics, market dynamics, and economic theories.",
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
@@ -61,7 +67,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: BookOpen,
-      title: "English Literature",
+      id: "igsce-english",
+      title: "IGSCE English Literature",
       description: "Develop critical analysis skills and master essay writing for O/A Level success.",
       color: "text-indigo-600",
       bgColor: "bg-indigo-50",
@@ -71,7 +78,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Globe,
-      title: "Geography",
+      id: "igsce-geography",
+      title: "IGSCE Geography",
       description: "Understand physical and human geography with interactive maps and case studies.",
       color: "text-teal-600",
       bgColor: "bg-teal-50",
@@ -81,7 +89,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Code,
-      title: "Computer Science",
+      id: "igsce-computer",
+      title: "IGSCE Computer Science",
       description: "Learn programming, algorithms, and computational thinking for the digital age.",
       color: "text-gray-600",
       bgColor: "bg-gray-50",
@@ -94,6 +103,21 @@ const EnhancedPopularSubjects = () => {
   const handleExploreCourse = (subjectTitle: string) => {
     // Navigate to course details with subject title as parameter
     navigate(`/course/${subjectTitle.toLowerCase().replace(/\s+/g, '-')}`);
+    //navigate(`/course/${courseId}`);
+    //     try {
+    //       const q = query(collection(db, "courses"), where("title", "==", subjectTitle));
+    //       const querySnapshot = await getDocs(q);
+
+    //       if (!querySnapshot.empty) {
+    //         const courseDoc = querySnapshot.docs[0];
+    //         const courseId = courseDoc.id;
+    //         navigate(`/course/${courseId}`);
+    //       } else {
+    //         console.error("Course not found!");
+    //       }
+    //     } catch (err) {
+    //       console.error("Error fetching course:", err);
+    //     }
   };
 
   return (
@@ -150,10 +174,10 @@ const EnhancedPopularSubjects = () => {
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs text-gray-500">{subject.students}</span>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300"
-                    onClick={() => handleExploreCourse(subject.title)}
+                    onClick={() => handleExploreCourse(subject.id)}
                   >
                     Explore Course
                   </Button>
