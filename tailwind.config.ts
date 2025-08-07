@@ -20,6 +20,8 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
+				lato: ['Lato', 'sans-serif'],
+				serif: ["DM Serif Text", 'serif']
 			},
 			fontSize: {
 				base: '16px',

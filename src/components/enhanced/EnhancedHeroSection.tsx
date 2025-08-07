@@ -9,7 +9,7 @@ import hero3 from "@/assets/hero-3.jpg";
 
 const EnhancedHeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+
   const slides = [
     {
       image: hero1,
@@ -44,14 +44,17 @@ const EnhancedHeroSection = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <section
+      id="home"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden 
+             bg-gradient-to-br from-blue-50 via-white to-green-50 font-serif text-[15px] ">
       {/* Background Images with Parallax Effect */}
+      <div className="absolute top-0 w-full h-24 md:h-28" />
       {slides.map((slide, index) => (
         <div
           key={index}
-          className={`absolute inset-0 transition-all duration-1000 ${
-            index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
-          }`}
+          className={`absolute inset-0 transition-all duration-1000 ${index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            }`}
         >
           <img
             src={slide.image}
@@ -71,19 +74,19 @@ const EnhancedHeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white pt-28 pb-20">
         <FadeInSection direction="up" delay={300}>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             {slides[currentSlide].title}
           </h1>
         </FadeInSection>
-        
+
         <FadeInSection direction="up" delay={600}>
           <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-4xl mx-auto opacity-90 leading-relaxed">
             {slides[currentSlide].subtitle}
           </p>
         </FadeInSection>
-        
+
         <FadeInSection direction="up" delay={900}>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
             <Button variant="hero" size="lg" className="group transform hover:scale-105 transition-all duration-300 shadow-2xl">
@@ -146,22 +149,21 @@ const EnhancedHeroSection = () => {
         {slides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide 
-                ? "bg-white scale-125 shadow-lg" 
-                : "bg-white/50 hover:bg-white/70"
-            }`}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide
+              ? "bg-white scale-125 shadow-lg"
+              : "bg-white/50 hover:bg-white/70"
+              }`}
             onClick={() => setCurrentSlide(index)}
           />
         ))}
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
+      {/* <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
         <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 };
