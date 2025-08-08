@@ -25,15 +25,15 @@ const Login = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      console.log(user)
 
-      const userRef = doc(db, "users", user.uid); // user document
+      const userRef = doc(db, "students", user.uid); // user document
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
         toast.custom((t) => (
           <ToastError t={t} title={`Existing Account Found`} message={`Please Log in.`} />
         ), { duration: 3000 });
-        return;
         setAccountNotFound(true);
         return false;
       }
