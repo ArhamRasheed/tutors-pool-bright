@@ -21,7 +21,9 @@ export default {
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
 				lato: ['Lato', 'sans-serif'],
-				serif: ["DM Serif Text", 'serif']
+				serif: ["DM Serif Text", 'serif'],
+				description: ["Ancizar Serif", "serif"],
+				montaga: ["Montaga", "sans-serif"]
 			},
 			fontSize: {
 				base: '16px',

@@ -7,26 +7,58 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { FadeInSection } from '@/components/FadeInSection';
 import React, { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDocs, collection, query, limit, where } from "firebase/firestore";
 import { db } from "../lib/firebase"; // apne firebase config ka import
+import math from "@/assets/course_cover_pics/math.jpg"
 
 export const CourseDetails: React.FC = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
+
   const [course, setCourse] = useState<any>(null);
+  const [tutor, setTutors] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const docRef = doc(db, "courses", courseId!);
-        const docSnap = await getDoc(docRef);
-        console.log(courseId);
-        if (docSnap.exists()) {
-          setCourse(docSnap.data());
-        } else {
-          console.error("No such course found!");
+        console.log("Course ID:", courseId);
+
+        // 1️⃣ Find the course by its "id" field
+        const coursesRef = collection(db, "courses");
+        const q = query(coursesRef, where("id", "==", courseId), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          throw new Error("Course Not Found");
         }
+
+        const firstDoc = querySnapshot.docs[0];
+        const courseData = { id: firstDoc.id, ...firstDoc.data() };
+        setCourse(courseData);
+
+        // 2️⃣ Get tutors for this course
+        const tutorEmails = firstDoc.data().tutors || [];
+        if (tutorEmails.length === 0) {
+          throw new Error("No Tutor");
+        }
+
+        // 3️⃣ Query tutors by email
+        const tutorsRef = collection(db, "tutors");
+        const tutorsQuery = query(tutorsRef, where("email", "in", tutorEmails), limit(1));
+        const tutorsSnap = await getDocs(tutorsQuery);
+
+        const tutorsList = tutorsSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setTutors(tutorsList[0]);
+
+        console.log(tutor)
+
+
+
       } catch (err) {
         console.error("Error fetching course:", err);
       } finally {
@@ -34,9 +66,7 @@ export const CourseDetails: React.FC = () => {
       }
     };
 
-    if (courseId) {
-      fetchCourse();
-    }
+    if (courseId) fetchCourse();
   }, [courseId]);
 
   const handleBackClick = () => {
@@ -71,22 +101,27 @@ export const CourseDetails: React.FC = () => {
           <Button
             variant="ghost"
             onClick={handleBackClick}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            className="group flex items-center justify-start text-muted-foreground hover:text-foreground font-lato px-0"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Courses
+            <span className="rounded-lg border border-gray-300 p-2 flex items-center justify-center ml-1 bg-white transform group-hover:rotate-45 transition duration-300">
+              <ArrowLeft className="h-4 w-4 text-black-1000" />
+            </span>
+            <span className="pl-2 pr-3 group-hover:text-white group-hover:text-800">Back to Courses</span>
           </Button>
+
+
+
         </div>
       </FadeInSection>
 
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Course Title */}
         <FadeInSection direction="up" className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight font-serif">
             {course.title}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {course.description}
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-description">
+            {course.fulldescription}
           </p>
         </FadeInSection>
 
@@ -94,9 +129,9 @@ export const CourseDetails: React.FC = () => {
         <FadeInSection direction="up" delay={100}>
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-elegant">
             <img
-              src={course.coverImage}
+              src={math}
               alt={course.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-fill"
             />
             <div className="absolute inset-0 bg-gradient-hero opacity-20" />
           </div>
@@ -116,7 +151,7 @@ export const CourseDetails: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {course.fullDescription}
+                    {course.fulldescription}
                   </p>
                 </CardContent>
               </Card>
@@ -130,7 +165,7 @@ export const CourseDetails: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-3">
-                    {course.topicsCovered?.map((topic: string, index: number) => (
+                    {course.topicscovered?.map((topic: string, index: number) => (
                       <div key={index} className="flex items-center gap-3">
                         <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
                         <span className="text-muted-foreground">{topic}</span>
@@ -180,28 +215,28 @@ export const CourseDetails: React.FC = () => {
                   <Separator />
 
                   {/* Tutor Information */}
-                  {course.tutor && (
+                  {tutor && (
                     <div className="space-y-4">
                       <h4 className="font-semibold flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Your Tutor
                       </h4>
                       <Link
-                        to={`/tutor/${course.tutor.id}`}
+                        to={`/tutor/${tutor.id}`}
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <Avatar className="h-12 w-12">
-                          <AvatarImage src={course.tutor.avatar} alt={course.tutor.name} />
-                          <AvatarFallback>{course.tutor.name.charAt(0)}</AvatarFallback>
+                          <AvatarImage src={tutor.avatar} alt={tutor.firtsName} />
+                          <AvatarFallback>{tutor.firstName.charAt(0).toUpperCase() + tutor.lastName.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <p className="font-medium">{course.tutor.name}</p>
+                          <p className="font-medium">{tutor.firstName + " " + tutor.lastName}</p>
                           <div className="flex items-center gap-2">
                             <div className="flex items-center">
-                              {renderStars(course.tutor.rating)}
+                              {renderStars(tutor.rating)}
                             </div>
                             <span className="text-sm text-muted-foreground">
-                              {course.tutor.rating} ({course.tutor.totalReviews} reviews)
+                              {tutor.rating} ({tutor.totalReviews} reviews)
                             </span>
                           </div>
                         </div>
