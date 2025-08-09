@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "sonner";
 import { ToastError } from "./JoinFree.js";
+import { log } from "console";
 
 
 const Login = () => {
@@ -27,7 +28,7 @@ const Login = () => {
       const user = result.user;
       console.log(user)
 
-      const userRef = doc(db, "students", user.uid); // user document
+      const userRef = doc(db, `${loginType}s`, user.uid); // user document
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
@@ -42,7 +43,7 @@ const Login = () => {
       // Optionally redirect to /dashboard
       navigate(`/${loginType}/${user.uid}`);
       return true;
-    } catch (error) { 
+    } catch (error) {
       console.error("Login error:", error.message);
     }
     finally {
@@ -54,8 +55,8 @@ const Login = () => {
       .then(async (userCredential) => {
         console.log(email, password)
         const user = userCredential.user;
-
-        const userDocRef = doc(db, "students", user.uid);
+        console.log(loginType)
+        const userDocRef = doc(db, `${loginType}s`, user.uid);
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
