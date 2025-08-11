@@ -100,7 +100,11 @@ const EnhancedHeroSection = () => {
               Start Learning
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="lg" className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/join?type=tutor')}
+              className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-300 backdrop-blur-sm">
               <Users className="mr-2 h-5 w-5" />
               Become a Tutor
             </Button>
