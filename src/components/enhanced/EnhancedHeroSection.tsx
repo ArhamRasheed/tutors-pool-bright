@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Play, Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FadeInSection } from "@/components/FadeInSection";
@@ -8,6 +9,7 @@ import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
 
 const EnhancedHeroSection = () => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
@@ -89,12 +91,20 @@ const EnhancedHeroSection = () => {
 
         <FadeInSection direction="up" delay={900}>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-            <Button variant="hero" size="lg" className="group transform hover:scale-105 transition-all duration-300 shadow-2xl">
+            <Button
+              variant="hero"
+              size="lg"
+              onClick={() => navigate('/join?type=student')}
+              className="group transform hover:scale-105 transition-all duration-300 shadow-2xl">
               <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
               Start Learning
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="lg" className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/join?type=tutor')}
+              className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-300 backdrop-blur-sm">
               <Users className="mr-2 h-5 w-5" />
               Become a Tutor
             </Button>
