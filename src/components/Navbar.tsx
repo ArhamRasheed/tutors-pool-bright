@@ -117,10 +117,12 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { firebaseUser, profile, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -180,17 +182,33 @@ const Navbar = () => {
 
 
           {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="ghost" className="text-black hover:text-white">
-                Log In
-              </Button>
-            </Link>
-            <Link to="/join">
-              <Button variant="default" className="bg-primary text-white hover:bg-primary/90">
-                Join for Free
-              </Button>
-            </Link>
+          <div className="flex items-center gap-4">
+            {!firebaseUser ? (
+              <>
+                <Link to="/login" className="text-primary">Log In</Link>
+                <Link to="/join" className="bg-primary text-white px-4 py-2 rounded">
+                  Join for Free
+                </Link>
+              </>
+            ) : (
+              <>
+                {profile?.role === "student" && (
+                  <Link to={`/student/${firebaseUser.uid}`} className="text-primary">Student Dashboard</Link>
+                )}
+                {profile?.role === "tutor" && (
+                  <Link to={`/tutor/${firebaseUser.uid}`} className="text-primary">Tutor Dashboard</Link>
+                )}
+                {profile?.role === "admin" && (
+                  <Link to="/admin" className="text-primary">Admin Panel</Link>
+                )}
+                <button
+                  onClick={logout}
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Logout
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Hamburger */}
