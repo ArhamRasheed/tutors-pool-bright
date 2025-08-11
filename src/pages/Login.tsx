@@ -28,7 +28,11 @@ const Login = () => {
       const user = result.user;
       console.log(user)
 
+<<<<<<< HEAD
       const userRef = doc(db, `${loginType}s`, user.uid); // user document
+=======
+      const userRef = doc(db, loginType + "s", user.uid); // user document
+>>>>>>> d736f957e8a3d08117a50bca48ee52cba5a94964
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
@@ -55,8 +59,13 @@ const Login = () => {
       .then(async (userCredential) => {
         console.log(email, password)
         const user = userCredential.user;
+<<<<<<< HEAD
         console.log(loginType)
         const userDocRef = doc(db, `${loginType}s`, user.uid);
+=======
+
+        const userDocRef = doc(db, loginType+"s", user.uid);
+>>>>>>> d736f957e8a3d08117a50bca48ee52cba5a94964
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
@@ -130,14 +139,18 @@ const Login = () => {
                     showPassword={showPassword}
                     setShowPassword={setShowPassword}
                     handleLogin={handleLogin}
-                    handleGoogleLogin={handleGoogleLogin} />
+                    handleGoogleLogin={handleGoogleLogin} 
+                    loginType={loginType}
+                    />
                 </TabsContent>
 
                 <TabsContent value="tutor" className="space-y-4 mt-6">
                   <LoginForm showPassword={showPassword}
                     setShowPassword={setShowPassword}
                     handleLogin={handleLogin}
-                    handleGoogleLogin={handleGoogleLogin} />
+                    handleGoogleLogin={handleGoogleLogin} 
+                    loginType={loginType}
+                    />
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -157,11 +170,12 @@ const Login = () => {
   );
 };
 
-const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, handleLogin }: {
+const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, handleLogin, loginType }: {
   showPassword: boolean;
   handleGoogleLogin: () => Promise<boolean>;
   handleLogin: (email: string, password: string) => Promise<boolean>;
   setShowPassword: (show: boolean) => void;
+  loginType: string
 
 }) => {
   const [email, setEmail] = useState("");
@@ -226,13 +240,14 @@ const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, handleLog
         }}>
         Sign In
       </Button>
-
+      {loginType === "student" && (
+        <>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <Separator className="w-full" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+          <span className="bg-background px-2 text-muted-foreground">OR</span>
         </div>
       </div>
 
@@ -264,6 +279,8 @@ const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, handleLog
         </svg>
         Continue with Google
       </Button>
+      </>
+      )}
     </>
   );
 };

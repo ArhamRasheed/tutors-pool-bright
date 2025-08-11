@@ -10,6 +10,13 @@ import React, { useEffect, useState } from "react";
 import { doc, getDocs, collection, query, limit, where } from "firebase/firestore";
 import { db } from "../lib/firebase"; // apne firebase config ka import
 import math from "@/assets/course_cover_pics/math.jpg"
+import biology from "@/assets/course_cover_pics/biology.jpg"
+import chemistry from "@/assets/course_cover_pics/chemistry.jpg"
+import computer_science from "@/assets/course_cover_pics/computer_science.jpg"
+import economics from "@/assets/course_cover_pics/economics.jpg"
+import english_literartue from "@/assets/course_cover_pics/english_literarture.jpg"
+import geography from "@/assets/course_cover_pics/geography.jpg"
+import physics from "@/assets/course_cover_pics/physics.jpg"
 
 export const CourseDetails: React.FC = () => {
   const { courseId } = useParams();
@@ -18,13 +25,21 @@ export const CourseDetails: React.FC = () => {
   const [course, setCourse] = useState<any>(null);
   const [tutor, setTutors] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const title_images = {
+    "IGCSE Mathematics": math,
+    "IGCSE Physics": physics,
+    "IGCSE Chemistry": chemistry,
+    "IGCSE Biology" : biology,
+    "IGSCE Economics" : economics,
+    "IGSCE English Literature" : english_literartue,
+    "IGSCE Geography" : geography,
+    "IGSCE Computer Science" : computer_science
+  }
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         console.log("Course ID:", courseId);
 
-        // 1️⃣ Find the course by its "id" field
         const coursesRef = collection(db, "courses");
         const q = query(coursesRef, where("id", "==", courseId), limit(1));
         const querySnapshot = await getDocs(q);
@@ -37,13 +52,11 @@ export const CourseDetails: React.FC = () => {
         const courseData = { id: firstDoc.id, ...firstDoc.data() };
         setCourse(courseData);
 
-        // 2️⃣ Get tutors for this course
         const tutorEmails = firstDoc.data().tutors || [];
         if (tutorEmails.length === 0) {
           throw new Error("No Tutor");
         }
 
-        // 3️⃣ Query tutors by email
         const tutorsRef = collection(db, "tutors");
         const tutorsQuery = query(tutorsRef, where("email", "in", tutorEmails), limit(1));
         const tutorsSnap = await getDocs(tutorsQuery);
@@ -103,7 +116,7 @@ export const CourseDetails: React.FC = () => {
             onClick={handleBackClick}
             className="group flex items-center justify-start text-muted-foreground hover:text-foreground font-lato px-0"
           >
-            <span className="rounded-lg border border-gray-300 p-2 flex items-center justify-center ml-1 bg-white transform group-hover:rotate-45 transition duration-300">
+            <span className="rounded-lg border border-blue-200 p-2 flex items-center justify-center ml-1 bg-white transform group-hover:bg-blue-200 group-hover:rotate-45 transition duration-300">
               <ArrowLeft className="h-4 w-4 text-black-1000" />
             </span>
             <span className="pl-2 pr-3 group-hover:text-white group-hover:text-800">Back to Courses</span>
@@ -117,7 +130,7 @@ export const CourseDetails: React.FC = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Course Title */}
         <FadeInSection direction="up" className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight font-serif">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight font-montaga">
             {course.title}
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-description">
@@ -129,7 +142,7 @@ export const CourseDetails: React.FC = () => {
         <FadeInSection direction="up" delay={100}>
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-elegant">
             <img
-              src={math}
+              src={title_images[course.title]}
               alt={course.title}
               className="w-full h-full object-fill"
             />
