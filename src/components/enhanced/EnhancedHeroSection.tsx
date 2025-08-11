@@ -4,9 +4,9 @@ import { ChevronLeft, ChevronRight, Play, Users, ArrowRight } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { FadeInSection } from "@/components/FadeInSection";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
-import hero1 from "@/assets/hero-1.jpg";
-import hero2 from "@/assets/hero-2.jpg";
-import hero3 from "@/assets/hero-3.jpg";
+import hero1 from "@/assets/hero-1.webp";
+import hero2 from "@/assets/hero-2.avif";
+import hero3 from "@/assets/hero-3.avif";
 
 const EnhancedHeroSection = () => {
   const navigate = useNavigate();
