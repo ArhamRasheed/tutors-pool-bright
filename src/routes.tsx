@@ -24,6 +24,7 @@ export default function AppRoutes() {
             <Route path="/original" element={<Index />} />
             <Route path={URLS.LOGIN} element={<Login />} />
             <Route path={URLS.JOIN} element={<JoinFree />} />
+            <Route path={URLS.COURSE_DETAILS(":courseId")} element={<CourseDetails />} />
 
             {/* STUDENT ROUTES */}
             <Route element={<ProtectedRoute />}>
@@ -37,7 +38,6 @@ export default function AppRoutes() {
             {/* TUTOR ROUTES */}
             <Route element={<ProtectedRoute />}>
                 <Route element={<RoleProtectedRoute allowedRoles={["tutor"]} />}>
-                    <Route path={URLS.COURSE_DETAILS(":courseId")} element={<CourseDetails />} />
                     <Route path={URLS.TUTOR_PROFILE(":id")} element={<TutorProfilePage />} />
                     <Route path={URLS.TUTOR_PROFILE_EDIT(":uid")} element={<TutorProfile />} />
                 </Route>

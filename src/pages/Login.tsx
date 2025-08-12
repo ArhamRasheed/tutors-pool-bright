@@ -26,8 +26,7 @@ const Login = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log(user)
-
+      //console.log(user)
       const userRef = doc(db, `${loginType}s`, user.uid); // user document
       const userSnap = await getDoc(userRef);
 
@@ -40,7 +39,7 @@ const Login = () => {
         return false;
       }
 
-      console.log("Signed in user:", user);
+     // console.log("Signed in user:", user);
       // Optionally redirect to /dashboard
       navigate(`/${loginType}/${user.uid}`);
       return true;

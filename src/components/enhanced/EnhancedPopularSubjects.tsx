@@ -13,8 +13,8 @@ const EnhancedPopularSubjects = () => {
   const subjects = [
     {
       icon: Calculator,
-      id: "igsce-mathematics",
-      title: "IGSCE Mathematics",
+      id: "igcse-mathematics",
+      title: "IGCSE Mathematics",
       description: "Master algebra, calculus, geometry, and advanced mathematical concepts with expert guidance.",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
@@ -24,8 +24,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Atom,
-      id: "igsce-physics",
-      title: "IGSCE Physics",
+      id: "igcse-physics",
+      title: "IGCSE Physics",
       description: "Understand complex physics principles, mechanics, thermodynamics, and quantum theory.",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
@@ -35,8 +35,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: FlaskConical,
-      id: "igsce-chemistry",
-      title: "IGSCE Chemistry",
+      id: "igcse-chemistry",
+      title: "IGCSE Chemistry",
       description: "Excel in organic, inorganic, and physical chemistry with practical applications.",
       color: "text-green-600",
       bgColor: "bg-green-50",
@@ -46,7 +46,7 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Dna,
-      title: "IGSCE Biology",
+      title: "IGCSE Biology",
       description: "Explore life sciences, genetics, ecology, and human anatomy with detailed explanations.",
       color: "text-red-600",
       bgColor: "bg-red-50",
@@ -56,8 +56,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: TrendingUp,
-      id: "igsce-economics",
-      title: "IGSCE Economics",
+      id: "igcse-economics",
+      title: "IGCSE Economics",
       description: "Learn micro and macroeconomics, market dynamics, and economic theories.",
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
@@ -67,8 +67,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: BookOpen,
-      id: "igsce-english",
-      title: "IGSCE English Literature",
+      id: "igcse-english",
+      title: "IGCSE English Literature",
       description: "Develop critical analysis skills and master essay writing for O/A Level success.",
       color: "text-indigo-600",
       bgColor: "bg-indigo-50",
@@ -78,8 +78,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Globe,
-      id: "igsce-geography",
-      title: "IGSCE Geography",
+      id: "igcs-geography",
+      title: "IGCSE Geography",
       description: "Understand physical and human geography with interactive maps and case studies.",
       color: "text-teal-600",
       bgColor: "bg-teal-50",
@@ -89,8 +89,8 @@ const EnhancedPopularSubjects = () => {
     },
     {
       icon: Code,
-      id: "igsce-computer",
-      title: "IGSCE Computer Science",
+      id: "igcse-computer",
+      title: "IGCSE Computer Science",
       description: "Learn programming, algorithms, and computational thinking for the digital age.",
       color: "text-gray-600",
       bgColor: "bg-gray-50",
