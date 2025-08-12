@@ -51,6 +51,12 @@ const Login = () => {
     }
   };
   const handleLogin = async (email: string, password: string): Promise<boolean> => {
+    if(!email || !password) {
+      toast.custom((t) => (
+        <ToastError t={t} title={`Missing Credentials`} message={`Please enter your Email and Password.`} />
+      ), { duration: 2750 });
+      return false;
+    }
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         console.log(email, password)
