@@ -33,8 +33,9 @@ const Login = () => {
 
       if (!userSnap.exists()) {
         toast.custom((t) => (
-          <ToastError t={t} title={`Existing Account Found`} message={`Please Log in.`} />
+          <ToastError t={t} title={`Existing Account NOT Found`} message={`Please sign up.`} />
         ), { duration: 3000 });
+        navigate("/join")
         setAccountNotFound(true);
         return false;
       }
@@ -51,7 +52,7 @@ const Login = () => {
     }
   };
   const handleLogin = async (email: string, password: string): Promise<boolean> => {
-    if(!email || !password) {
+    if (!email || !password) {
       toast.custom((t) => (
         <ToastError t={t} title={`Missing Credentials`} message={`Please enter your Email and Password.`} />
       ), { duration: 2750 });
@@ -59,9 +60,9 @@ const Login = () => {
     }
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
-        console.log(email, password)
+        // console.log(email, password)
         const user = userCredential.user;
-        console.log(loginType)
+        // console.log(loginType)
         const userDocRef = doc(db, `${loginType}s`, user.uid);
 
         const userDocSnap = await getDoc(userDocRef);
@@ -69,11 +70,17 @@ const Login = () => {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           console.log("📄 Firestore user data:", userData);
+          navigate(`/${loginType}/${user.uid}`);
+          return true;
         } else {
           console.log("⚠️ No user document found in Firestore");
+          toast.custom((t) => (
+            <ToastError t={t} title={`Existing Account NOT Found`} message={`Please sign up.`} />
+          ), { duration: 3000 });
+          navigate("/join")
+          setAccountNotFound(true);
+          return false;
         }
-        navigate(`/${loginType}/${user.uid}`);
-        return true;
 
       })
       .catch((error) => {

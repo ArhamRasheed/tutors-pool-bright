@@ -213,7 +213,6 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
-
         toast.custom((t) => (
           <ToastError t={t} title={`Existing Account Found`} message={`Please Log in.`} />
         ), { duration: 3000 });
