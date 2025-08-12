@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 
 const EnhancedIndex = () => {
   return (
+    //console
     <div className="min-h-screen">
       <Navbar />
       <EnhancedHeroSection />
