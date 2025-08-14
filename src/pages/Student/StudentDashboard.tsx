@@ -17,32 +17,71 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase"; // adjust path to your firebase config
+import { onAuthStateChanged } from "firebase/auth";
+
 
 const StudentDashboard = () => {
   // Mock student data
-  const student = {
-    name: "Sarah Johnson",
-    avatar: "/placeholder.svg",
-    grade: "AS Level",
-    currentStreak: 12,
-    nextSession: "Today, 3:00 PM - Mathematics",
-    completedSessions: 24,
-    pendingAssignments: 3
-  };
+  // const student = {
+  //   name: "Sarah Johnson",
+  //   avatar: "/placeholder.svg",
+  //   grade: "AS Level",
+  //   currentStreak: 12,
+  //   nextSession: "Today, 3:00 PM - Mathematics",
+  //   completedSessions: 24,
+  //   pendingAssignments: 3
+  // };
 
-  const sidebarItems = [
-    { name: "Dashboard", icon: LayoutDashboard, href: "/student/dashboard", active: true },
-    { name: "Sessions", icon: Calendar, href: "/student/sessions" },
-    { name: "Assignments", icon: BookOpen, href: "/student/assignments" },
-    { name: "Resources", icon: FolderOpen, href: "/student/resources" },
-    { name: "Flashcards", icon: Brain, href: "/student/flashcards" },
-  ];
+  // const sidebarItems = [
+  //   { name: "Dashboard", icon: LayoutDashboard, href: "/student/dashboard", active: true },
+  //   { name: "Sessions", icon: Calendar, href: "/student/sessions" },
+  //   { name: "Assignments", icon: BookOpen, href: "/student/assignments" },
+  //   { name: "Resources", icon: FolderOpen, href: "/student/resources" },
+  //   { name: "Flashcards", icon: Brain, href: "/student/flashcards" },
+  // ];
 
-  const recentSessions = [
-    { subject: "Mathematics", tutor: "Dr. Emily Chen", date: "Yesterday", rating: 5 },
-    { subject: "Physics", tutor: "Prof. James Wilson", date: "2 days ago", rating: 4 },
-    { subject: "Chemistry", tutor: "Dr. Sarah Parker", date: "3 days ago", rating: 5 },
-  ];
+  // const recentSessions = [
+  //   { subject: "Mathematics", tutor: "Dr. Emily Chen", date: "Yesterday", rating: 5 },
+  //   { subject: "Physics", tutor: "Prof. James Wilson", date: "2 days ago", rating: 4 },
+  //   { subject: "Chemistry", tutor: "Dr. Sarah Parker", date: "3 days ago", rating: 5 },
+  // ];
+
+  const [student, setStudent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "students", user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            setStudent(docSnap.data());
+          } else {
+            console.error("No such student document!");
+          }
+        } catch (error) {
+          console.error("Error fetching student data:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  if (!student) {
+    return <div className="flex items-center justify-center h-screen">No student data found</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-section">
@@ -54,7 +93,7 @@ const StudentDashboard = () => {
               <Link to="/" className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                 TutorsPool
               </Link>
-              <div className="hidden md:flex items-center space-x-6">
+              <div className="hidden md:flex items-center sapace-x-6">
                 <Link to="/student/dashboard" className="text-foreground hover:text-primary transition-all duration-300 font-medium">
                   My Learning
                 </Link>
@@ -170,7 +209,7 @@ const StudentDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <p className="font-semibold text-foreground">{student.nextSession}</p>
+                    <p className="font-semibold text-foreground">{student.nextSession?.date?.toDate().toLocaleString()} - {student.nextSession?.subject}</p>
                     <div className="flex items-center justify-between">
                       <Button variant="outline" size="sm">
                         View Details
