@@ -10,15 +10,8 @@ import { signOut } from "firebase/auth";
 type Role = "student" | "tutor" | "admin";
 
 export interface UserProfile {
-    uid: string;
     role: Role;
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    // Add commonly needed fields for immediate display
-    displayName?: string;
-    avatar?: string;
-    photoURL?: string;
+    data : any; // Replace with actual data structure
 }
 
 interface AuthContextValue {
@@ -48,16 +41,12 @@ async function fetchUserProfile(uid: string): Promise<UserProfile | null> {
                     (col === "students" ? "student" : col === "tutors" ? "tutor" : "admin");
 
                 return {
-                    uid,
-                    role,
-                    firstName: (data as any).firstName,
-                    lastName: (data as any).lastName,
-                    email: (data as any).email,
-                    // Create display name from firstName + lastName
-                    displayName: `${(data as any).firstName || ''} ${(data as any).lastName || ''}`.trim(),
-                    avatar: (data as any).avatar || (data as any).photoURL,
-                    photoURL: (data as any).photoURL || (data as any).avatar,
+                    role: role as Role,
+                    data: data
                 };
+            }
+            else {
+                return null;
             }
         } catch (error) {
             console.error(`Error fetching from ${col}:`, error);

@@ -2,15 +2,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator"; 
+import { Separator } from "@/components/ui/separator";
 import { LayoutDashboard, Calendar, BookOpen, FolderOpen, Brain, MessageCircle, Flame, Clock, GraduationCap, School, Mail, CalendarDays } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 
 const StudentProfile = () => {
+  const { profile,
+    loading: auth_loading,
+    isAuthenticated,
+    isStudent,
+    isTutor,
+    isAdmin } = useAuth();
   // Mock student data
   // const student = {
   //   name: "Sarah Johnson",
@@ -38,32 +43,29 @@ const StudentProfile = () => {
   ];
 
   const { uid } = useParams();
-  const [studentData, setStudentData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // useEffect(() => {
+  //   const fetchprofile = async () => {
+  //     try {
+  //       const docRef = doc(db, "students", uid);
+  //       const docSnap = await getDoc(docRef);
 
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      try {
-        const docRef = doc(db, "students", uid);
-        const docSnap = await getDoc(docRef);
+  //       if (docSnap.exists()) {
+  //         setprofile(docSnap.data());
+  //       } else {
+  //         console.log("No such student!");
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching student data:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-        if (docSnap.exists()) {
-          setStudentData(docSnap.data());
-        } else {
-          console.log("No such student!");
-        }
-      } catch (err) {
-        console.error("Error fetching student data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStudentData();
-  }, [uid]);
+  //   fetchprofile();
+  // }, [uid]);
 
 
-  if (loading) {
+  if (auth_loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground">
         Loading student profile...
@@ -71,10 +73,10 @@ const StudentProfile = () => {
     );
   }
 
-  if (!studentData) {
+  if (!isAuthenticated !|| !isStudent) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500 font-semibold">
-        Failed to load student data.
+        You must be logged in as a student to view this page.
       </div>
     );
   }
@@ -103,12 +105,12 @@ const StudentProfile = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 bg-gradient-primary px-3 py-2 rounded-full shadow-glow">
                 <Flame className="h-4 w-4 text-white" />
-                <span className="text-sm font-medium text-white">{studentData?.currentStreak ?? 0} day streak</span>
+                <span className="text-sm font-medium text-white">{profile.data?.currentStreak ?? 0} day streak</span>
               </div>
 
               <Avatar className="h-8 w-8">
-                <AvatarImage src={studentData?.avatar} alt={studentData?.firstName ?? ""} />
-                <AvatarFallback>{studentData?.firstName?.[0] ?? ""}</AvatarFallback>
+                <AvatarImage src={profile?.data.avatar} alt={profile?.data.firstName ?? ""} />
+                <AvatarFallback>{profile?.data.firstName?.[0] ?? ""}</AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -159,16 +161,16 @@ const StudentProfile = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={studentData?.avatar} alt={studentData?.firstName ?? ""} />
+                      <AvatarImage src={profile?.data.avatar} alt={profile?.data.firstName ?? ""} />
                       <AvatarFallback className="text-lg">
-                        {studentData?.firstName?.[0] ?? ""}
-                        {studentData?.lastName?.[0] ?? ""}
+                        {profile?.data.firstName?.[0] ?? ""}
+                        {profile?.data.lastName?.[0] ?? ""}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="text-lg font-semibold">{studentData?.firstName} {studentData?.lastName}</h3>
+                      <h3 className="text-lg font-semibold">{profile?.data.firstName} {profile?.data.lastName}</h3>
                       <div className="bg-gradient-primary px-2 py-1 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-medium text-white text-center">{studentData?.grade ?? "N/A"}</span>
+                        <span className="text-xs font-medium text-white text-center">{profile?.data.grade ?? "N/A"}</span>
                       </div>
                     </div>
                   </div>
@@ -178,16 +180,16 @@ const StudentProfile = () => {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{studentData?.email ?? "N/A"}</span>
+                      <span className="text-sm">{profile?.data.email ?? "N/A"}</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <School className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{studentData?.instituteName ?? "N/A"}</span>
+                      <span className="text-sm">{profile?.data.instituteName ?? "N/A"}</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <CalendarDays className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">
-                        Joined {studentData?.createdAt?.toDate?.().toDateString?.() ?? "N/A"}
+                        Joined {profile?.data.createdAt?.toDate?.().toDateString?.() ?? "N/A"}
                       </span>
                     </div>
                   </div>
@@ -209,7 +211,7 @@ const StudentProfile = () => {
                     </div>
                     <div>
                       <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                        {studentData?.currentStreak ?? 0}
+                        {profile?.data.currentStreak ?? 0}
                       </div>
                       <div className="text-sm text-muted-foreground">Day Learning Streak</div>
                     </div>

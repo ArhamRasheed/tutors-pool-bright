@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,14 +14,27 @@ import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "sonner";
 import { ToastError } from "./JoinFree.js";
-import { log } from "console";
+import { useAuth } from "@/contexts/AuthContext.js";
 
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const { profile, loading: auth_loading, isAuthenticated, isStudent, isTutor} = useAuth();
+
+useEffect(() => {
+  if (!auth_loading && isAuthenticated) {
+    if (isStudent) {
+      navigate(`/student/${profile?.data.uid}`);
+    }           
+    else if (isTutor) {
+      navigate(`/tutor/${profile?.data.uid}`);
+    }
+    
+  }
+}, [profile, auth_loading, navigate]);
   const [loginType, setLoginType] = useState("student");
   const [accountNotFound, setAccountNotFound] = useState(false);
-
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
@@ -76,7 +89,6 @@ const Login = () => {
           toast.custom((t) => (
             <ToastError t={t} title={`Existing Account NOT Found`} message={`Please sign up.`} />
           ), { duration: 3000 });
-          navigate("/join")
           setAccountNotFound(true);
           return false;
         }
@@ -89,7 +101,11 @@ const Login = () => {
     return true;
 
   };
-  const navigate = useNavigate();
+    if (auth_loading || profile) return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+    </div>
+  );
   return (
     <>
       {accountNotFound && (
@@ -184,7 +200,8 @@ const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, handleLog
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
+  
   return (
     <>
       <div className="space-y-2">

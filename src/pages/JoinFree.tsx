@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Mail, Lock, BookOpen, GraduationCap, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { XCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { CountryStateCitySelector } from "@/components/CountryStateCitySelector";
-import { error } from "console";
-import { boolean, number } from "zod";
+import { useAuth } from "@/contexts/AuthContext";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { userInfo } from "os";
 
@@ -29,7 +28,25 @@ const JoinFree = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [accountType, setAccountType] = useState("student");
+  const { profile, loading: auth_loading, isAuthenticated, isStudent, isTutor } = useAuth();
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!auth_loading && isAuthenticated) {
+      if (isStudent) {
+        navigate(`/student/${profile?.data.uid}`);
+      }
+      else if (isTutor) {
+        navigate(`/tutor/${profile?.data.uid}`);
+      }
+
+    }
+  }, [profile, auth_loading, navigate]);
+  if (auth_loading || profile) return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+    </div>
+  );
   // const location = useLocation();
   // const message = location.state?.message;
   const subjects = [
@@ -110,6 +127,7 @@ const JoinFree = () => {
 };
 
 const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword, subjects, grades }: any) => {
+  // const { profile, loading: auth_loading, isAuthenticated, isStudent, isTutor } = useAuth();
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [instituteType, setInstituteType] = useState(""); // "School" or "College"
   const handleSubjectToggle = (subject: string, isChecked: boolean) => {
@@ -158,6 +176,19 @@ const StudentForm = ({ showPassword, setShowPassword, showConfirmPassword, setSh
   });
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   if (!auth_loading && isAuthenticated) {
+  //     if (isStudent) {
+  //       navigate(`/student/${profile?.data.uid}`);
+  //     }
+  //     else if (isTutor) {
+  //       navigate(`/tutor/${profile?.data.uid}`);
+  //     }
+
+  //   }
+  // }, [profile, auth_loading, navigate]);
+  // if (auth_loading) return <p>Loading...</p>;
+  // if (profile) return null;
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };

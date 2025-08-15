@@ -138,7 +138,7 @@ const TutorProfileViewForStudents = () => {
                   <Avatar className="h-24 w-24 shadow-md">
                     <AvatarImage src={TutorData?.avatar} alt={TutorData?.firstName ?? ""} />
                     <AvatarFallback className="text-xl">
-                      {TutorData?.firstName?.[0] ?? "" + TutorData?.lastName?.[0] ?? ""}
+                      {TutorData?.firstName?.[0] ?? "" + (TutorData.lastName[0]) ? TutorData.lastName[0] : ""}
                     </AvatarFallback>
                   </Avatar>
 
