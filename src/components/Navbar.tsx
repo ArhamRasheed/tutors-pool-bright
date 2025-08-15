@@ -120,6 +120,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
+
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { firebaseUser, profile, logout } = useAuth();
@@ -185,10 +186,104 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {!firebaseUser ? (
               <>
-                <Link to="/login" className="text-primary">Log In</Link>
-                <Link to="/join" className="bg-primary text-white px-4 py-2 rounded">
-                  Join for Free
+                <Link
+                  to="/login"
+                  className="glow-button relative inline-block  rounded-lg px-4 py-2 font-montaga text-white bg-blue-900 overflow-hidden"
+                >
+                  Log In
                 </Link>
+                <style>{`
+        .glow-button {
+          position: relative;
+          z-index: 0;
+          border-radius: 10px;
+          cursor: pointer;
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          width:fit-content;
+        }
+
+        .glow-button::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          width: calc(100% + 4px);
+          height: calc(100% + 4px);
+          border-radius: 10px;
+          background: linear-gradient(45deg, #3b82f6, #60a5fa, #1e40af, #3b82f6);
+          background-size: 400%;
+          filter: blur(5px);
+          z-index: -1;
+          opacity: 0;
+          transition: opacity 0.3s ease-in-out;
+          animation: glowing 10s linear infinite;
+        }
+
+        .glow-button:hover::before {
+          opacity: 1;
+        }
+
+        @keyframes glowing {
+          0% { background-position: 0 0; }
+          50% { background-position: 400% 0; }
+          100% { background-position: 0 0; }
+        }
+      `}</style>
+
+                <Link to="/join" className="bg-primary  px-4 py-2 rounded-lg font-montaga join-button">
+                  <span className="text-[13px] text-black">Join for Free</span>
+                </Link>
+                <style >{`.join-button {
+    position: relative;
+    display: inline-block;
+    padding: 4 2;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1); /* translucent glass effect */
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    backdrop-filter: blur(10px); /* glass blur effect */
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4),
+                0 0 20px rgba(0, 255, 255, 0.2),
+                0 0 40px rgba(0, 255, 255, 0.1);
+}
+
+.join-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, #00fff0, #00bfff, #aeff00ff, #ff0055);
+    animation: rotate 4s linear infinite;
+    z-index: 0;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.join-button span {
+    position: relative;
+    z-index: 1;
+}
+
+.join-button:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6),
+                0 0 40px rgba(0, 255, 255, 0.4),
+                0 0 80px rgba(0, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+`}</style>
               </>
             ) : (
               <>
