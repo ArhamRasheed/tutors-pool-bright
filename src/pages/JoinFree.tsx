@@ -21,6 +21,8 @@ import { CountryStateCitySelector } from "@/components/CountryStateCitySelector"
 import { useAuth } from "@/contexts/AuthContext";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { userInfo } from "os";
+import "../styles/JoinFree.module.css";
+import styles from "../styles/JoinFree.module.css";
 
 
 
@@ -28,6 +30,7 @@ const JoinFree = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [accountType, setAccountType] = useState("student");
+  
   const { profile, loading: auth_loading, isAuthenticated, isStudent, isTutor } = useAuth();
   const navigate = useNavigate();
 
@@ -42,7 +45,7 @@ const JoinFree = () => {
 
     }
   }, [profile, auth_loading, navigate]);
-  if (auth_loading || profile) return (
+  if (auth_loading || !profile) return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
     </div>

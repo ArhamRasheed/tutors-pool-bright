@@ -1,0 +1,6 @@
+input:active,
+input:focus {
+  outline: 2px dashed rgb(6, 113, 179) !important;
+  box-shadow: none !important;
+
+}

@@ -23,7 +23,9 @@ export default {
 				lato: ['Lato', 'sans-serif'],
 				serif: ["DM Serif Text", 'serif'],
 				description: ["Ancizar Serif", "serif"],
-				montaga: ["Montaga", "sans-serif"]
+				montaga: ["Montaga", "sans-serif"],
+				poppins: ["Poppins", "sans-serif"],
+				chela: ["Chela One", "sans-serif"]
 			},
 			fontSize: {
 				base: '16px',
