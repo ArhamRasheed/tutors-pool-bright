@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Info, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { doc, getDoc, query, collection, where, getDocs } from "firebase/firestore";
 import { auth, provider, db } from "../lib/firebase.js";
 import { signInWithPopup } from "firebase/auth";
@@ -160,24 +159,30 @@ const Login = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           {/* Modal Container */}
           <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
-
+            <button
+              onClick={() => setForgotPassword(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition"
+            >
+              <X className="h-10 w-10 text-red-500 hover:opacity-40" />
+            </button>
             {/* Disclaimer */}
-            <p className="text-sm text-gray-600 mb-4">
-              Enter your registered Email
+            <p className="flex items-start text-sm text-gray-600 mb-4 font-bold">
+              <Info className="h-10 w-10 text-red-500 mt-0.5 mr-2" />
+              Enter your registered Email. You will receive a Password reset link if the Email is associated with an Account.
             </p>
             <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              className="font-lato bg-gray-100 pl-10 outline-none focus:ring-0  text-blue-800"
-              id="email"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="off"
-            ></Input>
-            <Button type="button" variant="ghost" size="icon" className="w-full mt-4 border border-rounded-lg bg-cyan-300 font-lato" onClick={handlePassReset}>Proceed with the given Email
-            </Button>
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                className="font-lato bg-gray-100 pl-10 outline-none focus:ring-0  text-blue-800"
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="off"
+              ></Input>
+              <Button type="button" variant="ghost" size="icon" className="w-full mt-4 border border-rounded-lg bg-cyan-300 font-lato hover:bg-red-500" onClick={handlePassReset}>Proceed with the given Email
+              </Button>
             </div>
 
           </div>
@@ -201,8 +206,8 @@ const Login = () => {
               {/* Account Type Toggle */}
               <Tabs value={loginType} onValueChange={setLoginType} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="student">Student</TabsTrigger>
-                  <TabsTrigger value="tutor">Tutor</TabsTrigger>
+                  <TabsTrigger value="student" className={`font-lato text-2x1 tracking-wider font-bold`}>Student</TabsTrigger>
+                  <TabsTrigger value="tutor" className={`font-lato text-2x1 tracking-wider font-bold`}>Tutor</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="student" className="space-y-4 mt-6">
@@ -217,7 +222,7 @@ const Login = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="tutor" className="space-y-4 mt-6">
+                <TabsContent value="tutor" className={`space-y-4 mt-6`}>
                   <LoginForm showPassword={showPassword}
                     setShowPassword={setShowPassword}
                     handleLogin={handleLogin}
@@ -326,50 +331,55 @@ const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, handleLog
           Sign In
         </Button>
       </div>
-      {loginType === "student" && (
-        <>
-          <button
-            className={`${styles["fancy"]} w-full`}
-            onClick={() => {
-              console.log("Google button clicked");
-              handleGoogleLogin();
-            }}
-          >
-            <span className={`${styles["top-key"]}`}></span>
+      <>
+        <button
+          className={`
+                ${styles["fancy"]} 
+                w-full 
+                transition-opacity
+                ${loginType === "student" ? "opacity-100" : "opacity-0 pointer-events-none"}
+              `}
+          onClick={() => {
+            console.log("Google button clicked");
+            handleGoogleLogin();
+          }}
+        >
+          <span className={styles["top-key"]}></span>
 
-            <span className={`${styles["text"]}`}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 mr-2"
-                viewBox="0 0 48 48"
-              >
-                <path
-                  fill="#EA4335"
-                  d="M24 9.5c3.54 0 6.7 1.22 9.19 3.6l6.83-6.83C35.9 2.9 30.47.5 24 .5 14.82.5 6.93 6.35 3.69 14.09l7.98 6.2C13.48 13.94 18.3 9.5 24 9.5z"
-                />
-                <path
-                  fill="#4285F4"
-                  d="M46.5 24.5c0-1.57-.14-3.08-.39-4.5H24v9h12.7c-.55 2.9-2.17 5.37-4.63 7.03l7.14 5.54C43.96 37.85 46.5 31.61 46.5 24.5z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M11.67 28.29c-.68-2.02-1.07-4.18-1.07-6.29s.39-4.27 1.07-6.29l-7.98-6.2C1.86 13.48.5 18.55.5 24s1.36 10.52 3.69 14.49l7.98-6.2z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M24 47.5c6.47 0 11.9-2.13 15.87-5.8l-7.14-5.54c-2.04 1.38-4.65 2.21-8.73 2.21-5.7 0-10.52-4.44-12.33-10.39l-7.98 6.2C6.93 41.65 14.82 47.5 24 47.5z"
-                />
-              </svg>
-              Sign in with Google
-            </span>
+          <span className={styles["text"]}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 mr-2"
+              viewBox="0 0 48 48"
+            >
+              <path
+                fill="#EA4335"
+                d="M24 9.5c3.54 0 6.7 1.22 9.19 3.6l6.83-6.83C35.9 2.9 30.47.5 24 .5 14.82.5 6.93 6.35 3.69 14.09l7.98 6.2C13.48 13.94 18.3 9.5 24 9.5z"
+              />
+              <path
+                fill="#4285F4"
+                d="M46.5 24.5c0-1.57-.14-3.08-.39-4.5H24v9h12.7c-.55 2.9-2.17 5.37-4.63 7.03l7.14 5.54C43.96 37.85 46.5 31.61 46.5 24.5z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M11.67 28.29c-.68-2.02-1.07-4.18-1.07-6.29s.39-4.27 1.07-6.29l-7.98-6.2C1.86 13.48.5 18.55.5 24s1.36 10.52 3.69 14.49l7.98-6.2z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 47.5c6.47 0 11.9-2.13 15.87-5.8l-7.14-5.54c-2.04 1.38-4.65 2.21-8.73 2.21-5.7 0-10.52-4.44-12.33-10.39l-7.98 6.2C6.93 41.65 14.82 47.5 24 47.5z"
+              />
+            </svg>
+            Sign in with Google
+          </span>
 
-            <span className={`${styles["bottom-key-1"]}`}></span>
-            <span className={`${styles["bottom-key-2"]}`}></span>
-          </button>
+          <span className={styles["bottom-key-1"]}></span>
+          <span className={styles["bottom-key-2"]}></span>
+        </button>
 
 
 
-          {/* <Button
+
+        {/* <Button
             variant="outline"
             size="lg"
             className="w-full fancy"
@@ -397,8 +407,7 @@ const LoginForm = ({ showPassword, setShowPassword, handleGoogleLogin, handleLog
             </svg>
             <span className="text">Sign in with Google</span>
           </Button> */}
-        </>
-      )}
+      </>
     </>
   );
 };

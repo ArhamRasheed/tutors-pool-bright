@@ -2,7 +2,9 @@
   background-image: url('../assets/login_back.png');
   min-width: 100%;
   min-height: 100%;
-  background-size: cover;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
   -webkit-overflow-scrolling: none !important;
   overflow: hidden !important;
 }
@@ -11,7 +13,11 @@
   background-color: transparent !important;
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
-
+.btn-tab {
+  background-color: transparent !important;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Times New Roman', Times, serif !important;
+}
 .login-label {
   color: white !important;
   font-weight: bold !important;
@@ -248,8 +254,6 @@ button.sign-in {
   text-decoration: none;
   color: white;
 }
-
-
 .fancy .top-key {
   height: 2px;
   width: 1.5625rem;
