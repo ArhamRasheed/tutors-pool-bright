@@ -45,7 +45,7 @@ const JoinFree = () => {
 
     }
   }, [profile, auth_loading, navigate]);
-  if (auth_loading || !profile) return (
+  if (auth_loading) return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
     </div>
@@ -63,7 +63,7 @@ const JoinFree = () => {
 
   return (
 
-    <div className="min-h-screen bg-gradient-section py-12 px-4">
+    <div className={`min-h-screen bg-gradient-section py-12 px-4 ${styles["back-window"]}`}>
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">Join TutorsPool</h1>

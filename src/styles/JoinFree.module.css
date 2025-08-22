@@ -4,3 +4,10 @@ input:focus {
   box-shadow: none !important;
 
 }
+.back-window {
+  background-image: url('../assets/signup_back.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+}
